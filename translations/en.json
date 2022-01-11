@@ -1,0 +1,206 @@
+{
+  "login": {
+    "header": "",
+    "mobileNo": "Mobile No",
+    "password": "Password",
+    "or": "Or",
+    "and": " and ",
+    "buttonLogin": "Login",
+    "buttonRegister": "Register",
+    "errorUsernameEmpty": "Please enter mobile number",
+    "errorPasswordEmpty": "Please enter password",
+    "errorIncorrentUsernameOrPassword": "Mobile number or password is incorrect",
+    "errorNotfoundUsername": "Mobile number not found"
+  },
+  "register": {
+    "header": "Register",
+    "idCard": "ID Card",
+    "mobileNo": "Mobile No",
+    "password": "Password",
+    "day": "Date",
+    "month": "Month",
+    "year": "Year",
+    "confirmPassword": "Confirm Password",
+    "validationEmptyIdCard": "Please enter the ID card.",
+    "validationIncorrectIdCard": "Incorrect ID card.",
+    "validationEmptyPhoneNumber": "Please enter the mobile number.",
+    "validationIncorrectPhoneNumber": "Incorrent mobile.",
+    "validationEmptyPassword": "Please enter the password.",
+    "validationLessPassword": "Password not less than 6 characters",
+    "validationEmptyConfirmPassword": "Please enter the confirm password.",
+    "validationLessConfirmPassword": "Confirm password, not less than 6 characters",
+    "validationNotMatchPassword": "Confirm password does not match the password. Please check again.",
+    "buttonRegister": "Confirm",
+    "alertRegister": "Please register",
+    "alertRegisterSuccess": "Register success.",
+    "alertOtpFail": "OTP is incorrent.",
+    "error614": "Member information is incorrect.",
+    "error615": "No license or license expire.",
+    "select": "Please choose",
+    "titleHeader": "Please fill in the information",
+    "alertNextInterestedTitle": "Tell us, what interests you",
+    "alertNextInterested": "Tell us which area you are interested in. Specify at least 1 category so we can find the best promotion for you.",
+    "confirmRegistration": "Confirm registration",
+    "informOtp": "The system will inform the OTP via SMS of mobile number",
+    "mobilePhoneNumber": "Mobile number",
+    "resendOtp": "Resend the OTP again"
+  },
+  "main": {
+    "header": "",
+    "feeds": "Activities",
+    "campaign": "Campaign",
+    "privilage": "Privilage",
+    "banner": "Banner",
+    "profileCard": "Profile card",
+    "privilageForMember": "About Card",
+    "member": "Member",
+    "contact": "Contact",
+    "redeem": "Redeem",
+    "closePopUp": "Do not show this message again."
+  },
+  "menu": {
+    "header": "Menu",
+    "profile": "Profile",
+    "history": "Purchase / Redeem History",
+    "changeLanguage": "Change Language",
+    "language": "English",
+    "logout": "Logout",
+    "alertLogoutMessage": "Do you want to log out?",
+    "cancel": "Cancel"
+  },
+  "profile": {
+    "header": "Profile",
+    "headerPersonalInformation": "Personal information",
+    "code": "Code",
+    "status": "Status",
+    "title": "Title",
+    "name": "Name",
+    "gender": "Gender",
+    "birthday": "Birthday",
+    "address": "Address",
+    "road": "road",
+    "subdistrict": "subdistrict",
+    "district": "district",
+    "province": "province",
+    "postCode": "Post code",
+    "edit": "Edit",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "E-mail",
+    "save": "Save",
+    "alert": "Successful",
+    "confirmEditProfile": "Confirm for edit profile?",
+    "update7days": "The system will update within 7 working days"
+  },
+  "history": {
+    "header": "Purchase / Redeem History",
+    "redeemHistoryTabTitle": "Redeem History",
+    "purchaseHistoryTabTitle": "Purchase History"
+  },
+  "changeLanguage": {
+    "header": "Change Language",
+    "language": "English"
+  },
+  "feeds": {
+    "header": "Activities",
+    "noData": "Data not found."
+  },
+  "campaign": {
+    "header": "Campaign",
+    "noData": "Data not found."
+  },
+  "privilage": {
+    "header": "Privilage",
+    "noData": "Data not found."
+  },
+  "banner": {
+    "header": "Banner"
+  },
+  "profileCard": {
+    "header": "Profile Card",
+    "headerMemberCard": "Member Card",
+    "code": "Code",
+    "rewardPoint": "Reward Point",
+    "dateOfExpiry": "Date of expiry",
+    "rewardPointToday": "Reward Point Today ( effective the next day. )",
+    "detail": "Detail"
+  },
+  "privilageForMember": {
+    "header": "About card"
+  },
+  "instruction": {
+    "header": "How to use"
+  },
+  "contact": {
+    "map": "Map",
+    "header": "Contact",
+    "headQuarter": "headQuarter",
+    "branch": "branch"
+  },
+  "interested": {
+    "header": "Interested",
+    "buttonNext": "Next"
+  },
+  "redeem": {
+    "header": "Redeem",
+    "freeRedeem": "Free Redeem",
+    "purchaseRedeem": "Purchase Redeem",
+    "couponRedeem": "Coupon Redeem"
+  },
+  "fingerPrint": {
+    "header": "Access with Fingerprint",
+    "description": "User can log in by biometric when switch on fingerprint method",
+    "description2": "Switch for use Fingerprint method",
+    "alert": "Would you like to turn on Fingerprint ?"
+  },
+  "notiAlert": {
+    "header": "Notification"
+  },
+  "alert": {
+    "errorTitle": "Error",
+    "skip": "Skip",
+    "next": "Next",
+    "ok": "Ok",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorDetail": "Data not found",
+    "internetError": "Please check your internet connection"
+  },
+  "selectBase": {
+    "header": "Set up database",
+    "lebel": "Please Specify",
+    "scanQR": "Scan QRCode",
+    "questionAdd": "Would you like to add the ",
+    "questionConnect": "Would you like to connect ?",
+    "questionDelete": "Would you like to delete ?",
+    "Alert": "Database was exited",
+    "Alert2": "Application will reset after press \" Ok \"",
+    "Alert3": "Please fill in or Scan QRcode",
+    "title": "Select Base",
+    "connect": "Connect",
+    "add": "Add",
+    "delete": "Delete",
+    "error": "No Database",
+    "SelectImg": "Choose Image",
+    "cannotDelete": "Can not delete the active database"
+  },
+  "listEmpty": "Item not found",
+  "qa": {
+    "header": "Q/A"
+  },
+  "pincode": {
+    "enterPassword": "Enter Password",
+    "incorrentPassword": "Wrong password Please re-enter",
+    "tryAgain": "Try Again",
+    "loginFingerPrintScanner": "Login using a fingerprint scanner",
+    "orCancelToReturnUsingPin": "or cancel to return using PIN"
+  },
+  "term": {
+    "title": "Term and conditions"
+  },
+  "button": {
+    "back": "Back",
+    "next": "Next",
+    "select": " Please Select"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "login": {
+    "header": "",
+    "mobileNo": "เบอร์โทรศัพท์ผู้ใช้",
+    "password": "รหัสผ่าน",
+    "or": "หรือ",
+    "and": " และ ",
+    "buttonLogin": "เข้าสู่ระบบ",
+    "buttonRegister": "สมัครสมาชิก",
+    "errorUsernameEmpty": "กรุณากรอกเบอร์โทรศัพท์ผู้ใช้",
+    "errorPasswordEmpty": "กรุณากรอกรหัสผ่าน",
+    "errorIncorrentUsernameOrPassword": "เบอร์โทรศัพท์ผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+    "errorNotfoundUsername": "ไม่พบข้อมูลสมาชิก"
+  },
+  "register": {
+    "header": "สมัครสมาชิก",
+    "idCard": "บัตรประชาชน",
+    "mobileNo": "เบอร์โทรศัพท์ผู้ใช้",
+    "password": "รหัสผ่าน",
+    "day": "วันที่",
+    "month": "เดือน",
+    "year": "ปี",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "validationEmptyIdCard": "กรุณากรอกรหัสบัตรประชาชน",
+    "validationIncorrectIdCard": "กรอกบัตรประชาชนไม่ถูกต้อง",
+    "validationEmptyPhoneNumber": "กรุณากรอกเบอร์โทรศัพท์ผู้ใช้",
+    "validationIncorrectPhoneNumber": "กรอกเบอร์โทรศัพท์ผู้ใช้ไม่ถูกต้อง",
+    "validationEmptyPassword": "กรุณากรอกรหัสผ่าน",
+    "validationLessPassword": "รหัสผ่านห้ามต่ำกว่า 6 ตัวอักษร",
+    "validationEmptyConfirmPassword": "กรุณากรอกรหัสผ่านยืนยัน",
+    "validationLessConfirmPassword": "รหัสผ่านยืนยันห้ามต่ำกว่า 6 ตัวอักษร",
+    "validationNotMatchPassword": "ยืนยันรหัสผ่านไม่ตรงกับรหัสผ่าน กรุณาตรวจสอบใหม่อีกครั้ง",
+    "buttonRegister": "ยืนยัน",
+    "alertRegister": "กรุณาสมัครสมาชิก",
+    "alertRegisterSuccess": "สมัครสมาชิกเรียบร้อยแล้ว",
+    "alertOtpFail": "รหัสยืนยัน OTP ไม่ถูกต้อง",
+    "error614": "ข้อมูลสมาชิกไม่ถูกต้อง",
+    "error615": "ไม่มีใบอนุญาตหรือใบอนุญาตหมดอายุ",
+    "select": "โปรดระบุ",
+    "titleHeader": "กรุณากรอกข้อมูล",
+    "alertNextInterestedTitle": "บอกเราสิว่าคุณสนใจด้านไหน?",
+    "alertNextInterested": "ระบุอย่างน้อย 1 หมวด เพื่อให้เราหาโปรโมชั่นที่ดีที่สุดให้คุณ",
+    "confirmRegistration": "ยืนยันการลงทะเบียนเรียบร้อย",
+    "informOtp": "ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ",
+    "mobilePhoneNumber": "เบอร์มือถือ",
+    "resendOtp": "ส่ง OTP อีกครั้ง"
+  },
+  "main": {
+    "header": "",
+    "feeds": "กิจกรรม",
+    "campaign": "แคมเปญ",
+    "privilage": "สิทธิพิเศษ",
+    "banner": "แบนเนอร์",
+    "profileCard": "แสดงบัตรของฉัน",
+    "privilageForMember": "เกี่ยวกับบัตร",
+    "member": "สมาชิก",
+    "contact": "ติดต่อเรา",
+    "redeem": "แลกแต้ม",
+    "closePopUp": "ไม่แสดงข้อความนี้อีก"
+  },
+  "menu": {
+    "header": "ประวัติสมาชิก",
+    "profile": "ข้อมูลส่วนตัว",
+    "history": "ประวัติการซื้อ / แลกแต้ม",
+    "changeLanguage": "เปลี่ยนภาษา",
+    "language": "ภาษาไทย",
+    "logout": "ออกจากระบบ",
+    "alertLogoutMessage": "คุณต้องการออกจากระบบหรือไม่?",
+    "cancel": "ยกเลิก"
+  },
+  "profile": {
+    "header": "ข้อมูลส่วนตัว",
+    "headerPersonalInformation": "ข้อมูลส่วนบุคคล",
+    "code": "รหัสสมาชิก",
+    "status": "สถานะการใช้งาน",
+    "title": "คำนำหน้า",
+    "name": "ชื่อ - นามสกุล",
+    "gender": "เพศ",
+    "birthday": "วันเกิด",
+    "address": "ที่อยู่",
+    "road": "ถนน",
+    "subdistrict": "ตำบล/แขวง",
+    "district": "อำเภอ/เขต",
+    "province": "จังหวัด",
+    "postCode": "รหัสไปรษณีย์",
+    "edit": "แก้ไข",
+    "firstName": "ชื่อ",
+    "lastName": "นามสกุล",
+    "email": "อีเมลล์",
+    "save": "บันทึก",
+    "alert": "บันทึกข้อมูลเรียบร้อย",
+    "confirmEditProfile": "ยืนยันการแก้ไขข้อมูลส่วนตัว?",
+    "update7days": "ระบบจะทำการอัพเดทภายใน 7 วันทำการ"
+  },
+  "history": {
+    "header": "ประวัติการซื้อ / แลกแต้ม",
+    "redeemHistoryTabTitle": "ประวัติการแลกแต้ม",
+    "purchaseHistoryTabTitle": "ประวัติการซื้อ"
+  },
+  "changeLanguage": {
+    "header": "เปลี่ยนภาษา",
+    "language": "ภาษาไทย"
+  },
+  "feeds": {
+    "header": "กิจกรรม",
+    "noData": "ไม่พบข้อมูลกิจกรรม"
+  },
+  "campaign": {
+    "header": "แคมเปญ",
+    "noData": "ไม่พบข้อมูลแคมเปญ"
+  },
+  "privilage": {
+    "header": "สิทธิพิเศษ",
+    "noData": "ไม่พบข้อมูลสิทธิพิเศษ"
+  },
+  "banner": {
+    "header": "แบนเนอร์"
+  },
+  "profileCard": {
+    "header": "บัตรของฉัน",
+    "headerMemberCard": "ข้อมูลบัตรสมาชิก",
+    "code": "รหัสบัตรสมาชิก",
+    "rewardPoint": "แต้มสะสม",
+    "dateOfExpiry": "วันหมดอายุบัตร",
+    "rewardPointToday": "แต้มวันนี้ ( มีผลวันถัดไป )",
+    "detail": "รายละเอียด"
+  },
+  "privilageForMember": {
+    "header": "เกี่ยวกับบัตร"
+  },
+  "instruction": {
+    "header": "วิธีใช้"
+  },
+  "contact": {
+    "map": "แผนที่",
+    "header": "ติดต่อเรา",
+    "headQuarter": "สำนักงานใหญ่",
+    "branch": "สาขา"
+  },
+  "interested": {
+    "header": "ข้อมูลความสนใจ",
+    "buttonNext": "ต่อไป"
+  },
+  "redeem": {
+    "header": "แลกแต้ม",
+    "freeRedeem": "แลกฟรี",
+    "purchaseRedeem": "แต้มแลกซื้อ",
+    "couponRedeem": "แต้มแลกคูปองส่วลด"
+  },
+  "fingerPrint": {
+    "header": "การเข้าใช้งานด้วย Fingerprint",
+    "description": "เมื่อเปิดใช้งานด้วย Fingerprint จะสามารถเข้าใช้งานด้วยระบบสแกนลายนิ้วมือได้",
+    "description2": "เปิดใช้งาน Fingerprint",
+    "alert": "ต้องการเปิดการใช้งาน Fingerprint หรือไม่?"
+  },
+  "notiAlert": {
+    "header": "การแจ้งเตือน"
+  },
+  "alert": {
+    "errorTitle": "พบข้อผิดพลาด",
+    "skip": "ข้าม",
+    "next": "ต่อไป",
+    "ok": "ตกลง",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "errorDetail": "ไม่พบข้อมูลในระบบ",
+    "internetError": "กรุณาตรวจสอบสัญญาณอินเตอร์เน็ต"
+  },
+  "selectBase": {
+    "header": "ตั้งค่าฐานข้อมูลร้านค้า",
+    "lebel": "โปรดระบุ..",
+    "scanQR": "สแกนคิวอาร์โค้ด",
+    "questionAdd": "คุณต้องการเพิ่มร้านค้า",
+    "questionConnect": "คุณต้องการเชื่อมต่อร้านค้า",
+    "questionDelete": "คุณต้องการลบร้านค้า",
+    "Alert": "มีฐานข้อมูลนี้แล้วในระบบ",
+    "Alert2": "ระบบจะทำการรีเซ็ตแอปพลิเคชั่น ใหม่ทันทีหลังจากกดปุ่ม \"ตกลง\"",
+    "Alert3": "กรุณากรอก IP Address หรือ สแกนคิวอาร์โค้ด",
+    "title": "เลือกฐานข้อมูล",
+    "connect": "เชื่อมต่อ",
+    "add": "เพิ่มร้านค้า",
+    "delete": "ลบ",
+    "error": "ไม่มีฐานข้อมูล",
+    "SelectImg": "ตัวเลือกรูปภาพ",
+    "cannotDelete": "ไม่สามารถลบฐานข้อมูลที่กำลังใช้งานได้"
+  },
+  "listEmpty": "ไม่พบรายการ",
+  "qa": {
+    "header": "ช่วยเหลือ"
+  },
+  "pincode": {
+    "enterPassword": "กรอกรหัสผ่าน",
+    "incorrentPassword": "รหัสผ่านผิดพลาด กรุณากรอกใหม่",
+    "tryAgain": "ลองอีกครั้ง",
+    "loginFingerPrintScanner": "เข้าใช้งานด้วยสแกนลายนิ้วมือ",
+    "orCancelToReturnUsingPin": "หรือ ยกเลิกเพื่อกลับไปใช้ PIN"
+  },
+  "term": {
+    "title": "ข้อกำหนดและเงื่อนไข"
+  },
+  "button": {
+    "back": "กลับ",
+    "next": "ถัดไป",
+    "select": "โปรดระบุ"
+  }
+}
