@@ -18,9 +18,17 @@ import {
 import Dialog from 'react-native-dialog';
 import {FontSize} from '../components/FontSizeHelper';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Header, Button, Body, Left, Right, Title} from 'native-base';
+import {Header, 
+  Button, 
+  Body, 
+  Left, 
+  Right, 
+  Title,
+ 
+} from 'native-base';
+import { Picker,} from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Picker} from 'native-base';
+ 
 import DatePicker from '../components/DatePicker';
 import {useSelector, useDispatch} from 'react-redux';
 import Colors from '../src/Colors';
@@ -64,10 +72,7 @@ const PersonalInfoScreen = () => {
   });
   const [gender, setGender] = useState('');
   const addGender = () => {
-    console.log(
-      'userReducer.userData[userIndex].sex' +
-        userReducer.userData[userIndex].title,
-    );
+   
     if (userReducer.userData[userIndex].title == 'นาย') {
       Language.getLang() == 'th' ? setGender('ชาย') : setGender('Male');
     } else if (
@@ -88,9 +93,8 @@ const PersonalInfoScreen = () => {
     setShowDialog(false);
   };
 
-  const _setDispatch = async () => {
+  const _setDispatch = async () => {  
     let tempUser = userReducer.userData;
-
     if (newData.title == data.title) {
       tempUser[userIndex].title = data.title;
     } else {
@@ -109,7 +113,6 @@ const PersonalInfoScreen = () => {
     if (newData.birthDate == '') {
       tempUser[userIndex].birthDate = data.birthDate;
     } else {
-      console.log(newData.birthDate.replace(/-/gi, ''));
       tempUser[userIndex].birthDate = newData.birthDate.replace(/-/gi, '');
     }
     if (newData.ADDR_1 == '') {
@@ -137,95 +140,19 @@ const PersonalInfoScreen = () => {
     } else {
       tempUser[userIndex].email = newData.email;
     }
-
     tempUser[userIndex].interestImg = interestReducer.interestImg;
     if (gender == 'ชาย') {
       tempUser[userIndex].sex = 'M';
     } else {
       tempUser[userIndex].sex = 'F';
     }
-
-    await fetch(userReducer.http + 'MbUsers', {
-      method: 'POST',
-      body: JSON.stringify({
-        'BPAPUS-BPAPSV': Constants.SERVICE_ID,
-        'BPAPUS-LOGIN-GUID': loginReducer.guid,
-        'BPAPUS-FUNCTION': 'LoginByMobile',
-        'BPAPUS-PARAM':
-          '{"MB_CNTRY_CODE": "66", "MB_REG_MOBILE": "' +
-          userReducer.userData[userIndex].phoneNum +
-          '",    "MB_PW": "' +
-          1234 +
-          '"}',
-      }),
-    })
-      .then((response) => response.json())
-      .then(async (json) => {
-        let responseData = JSON.parse(json.ResponseData);
-        let NEW_GUID = responseData.MB_LOGIN_GUID;
-        let sex = '';
-        if (tempUser[userIndex].title == 'นาย') {
-          sex = 'M';
-        } else if (
-          tempUser[userIndex].title == 'นาง' ||
-          tempUser[userIndex].title == 'นางสาว'
-        ) {
-          sex = 'F';
-        }
-        await fetch(userReducer.http + 'MbUsers', {
-          method: 'POST',
-          body: JSON.stringify({
-            'BPAPUS-BPAPSV': loginReducer.serviceID,
-            'BPAPUS-LOGIN-GUID': NEW_GUID,
-            'BPAPUS-FUNCTION': 'UpdateMember',
-            'BPAPUS-PARAM':
-              '{"MB_INTL": "' +
-              tempUser[userIndex].title +
-              '","MB_NAME": "' +
-              tempUser[userIndex].firstName +
-              '","MB_LOGIN_GUID": "' +
-              NEW_GUID +
-              '","MB_SURNME": "' +
-              tempUser[userIndex].lastName +
-              '","MB_SEX": "' +
-              sex +
-              '","MB_BIRTH": "' +
-              tempUser[userIndex].birthDate +
-              '","MB_ADDR_1": "' +
-              tempUser[userIndex].ADDR_1 +
-              '","MB_POST": "' +
-              tempUser[userIndex].postCode +
-              '","MB_EMAIL": "' +
-              tempUser[userIndex].email +
-              '","MB_CNTRY_CODE": "66", "MB_REG_MOBILE": "' +
-              tempUser[userIndex].phoneNum +
-              '","MB_PW": "' +
-              1234 +
-              '","MB_E_NAME": "","MB_ADDR_2": "' +
-              tempUser[userIndex].ADDR_2 +
-              '","MB_ADDR_3": "' +
-              tempUser[userIndex].ADDR_3 +
-              '","MB_MT": "","MB_COLOR": "", "MB_ACTIVITY": "", "MB_HOBBY": "",  "MB_INTEREST": ""}',
-          }),
-        })
-          .then((response) => response.json())
-          .then(async (json) => {
-            if (json && json.ResponseCode == '200') {
-              dispatch(userActions.setUserData(tempUser));
-              navigation.navigate('AuthenticationScreen', {navi: 'Menu'});
-            } else {
-              console.log('ERROR : ' + json.ReasonString);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      });
+    const navi = 'Menu';
+    const newnvi = { navi , tempUser };
+    navigation.navigate('AuthenticationScreen', {navi: newnvi});
   };
   const onChangeData = (date) => {
     setNewData({...newData, birthDate: date});
   };
-
   const _onClick = (i, index) => {
     let temp = interestReducer.interestImg;
     if (temp && temp[index][i].check === true) {

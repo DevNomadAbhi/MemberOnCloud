@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,147 +6,304 @@ import {
   Dimensions,
   Text,
   Platform,
+  ActivityIndicator,
   Alert,
+  Image,
+  ImageBackground,
+  KeyboardAvoidingView,
+  ScrollView,
+  TouchableNativeFeedback,
+  TouchableOpacity,
 } from 'react-native';
-
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { Picker, } from 'native-base';
+import { useStateIfMounted } from 'use-state-if-mounted';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import RNRestart from 'react-native-restart';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {
-  Container,
-  Header,
-  Content,
-  Left,
-  Right,
-  Title,
-  Body,
-  Button,
-  Picker,
-  Form,
-} from 'native-base';
-import {connect} from 'react-redux';
-import Icon from 'react-native-vector-icons/FontAwesome';
+
+import { connect } from 'react-redux';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../src/Colors';
-import {useSelector, useDispatch} from 'react-redux';
-import {FontSize} from '../components/FontSizeHelper';
-import * as loginActions from '../src/actions/loginActions';
-import * as userActions from '../src/actions/userActions';
+import { useSelector, useDispatch } from 'react-redux';
+import { FontSize } from '../components/FontSizeHelper';
+import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
-import {Language} from '../translations/I18n';
+import { Language, changeLanguage } from '../translations/I18n';
+
+import DeviceInfo from 'react-native-device-info';
+
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const SelectBase = ({navigation, route}) => {
-  const [titleName, setTitleName] = useState('');
-  const [isShowDialog, setShowDialog] = useState(false);
-  const [isShowDialog2, setShowDialog2] = useState(false);
-  const [isShowDialog3, setShowDialog3] = useState(false);
-  const [ipAddress, setIpAddress] = useState('IP Address:');
-  const dispatch = useDispatch();
-  const userReducer = useSelector(({userReducer}) => userReducer);
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
-  const [title, setTitle] = useState(() => {
-    if (userReducer.http == '' && userReducer.userData.length == 0) {
-      return '-1';
-    } else {
-      return userReducer.http;
-    }
-  });
-  const handleYes = async () => {
-    let temp = [];
-    temp = loginReducer.ipAddress;
-    if (route.params) {
-      temp.push(route.params.post);
-      dispatch(loginActions.ipAddress(temp));
-      dispatch(userActions.setUserHttp(route.params.post.label));
-      setShowDialog(false);
-      setTimeout(() => {
-        RNRestart.Restart();
-      }, 1000);
-    } else {
-      let x = await checkIPAddress(titleName);
-      if (!x) {
-        Alert.alert('ไม่สามารถเชื่อมต่อระบบได้');
-        setShowDialog(false);
-      } else {
-        let check = false;
-        for (let i in loginReducer.ipAddress) {
-          if (
-            loginReducer.ipAddress[i].value == titleName ||
-            loginReducer.ipAddress[i].label == titleName
-          ) {
-            setShowDialog(false);
-            Alert.alert(Language.t('selectBase.Alert'));
-            check = true;
+import * as loginActions from '../src/actions/loginActions';
+import * as registerActions from '../src/actions/registerActions';
+import * as databaseActions from '../src/actions/databaseActions';
 
+const SelectBase = ({ route }) => {
+
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const {
+    container2,
+    container1,
+    button,
+    textButton,
+    topImage,
+    tabbar,
+    buttonContainer,
+  } = styles;
+
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
+  const registerReducer = useSelector(({ registerReducer }) => registerReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
+
+  const [selectedValue, setSelectedValue] = useState('');
+  const [selectbaseValue, setSelectbaseValue] = useState('-1');
+  const [selectlanguage, setlanguage] = useState(Language.getLang() == 'th' ? 'th' : 'en');
+  const [basename, setBasename] = useState('');
+  const [baseurl, setBsaeurl] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isShowDialog, setShowDialog] = useState(false);
+  const [loading, setLoading] = useStateIfMounted(false);
+  const [loading_backG, setLoading_backG] = useStateIfMounted(true);
+  const [machineNo, setMachineNo] = useState('');
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState(loginReducer.ipAddress.length > 0 ? loginReducer.ipAddress : '');
+  const [data, setData] = useStateIfMounted({
+    secureTextEntry: true,
+  });
+  const [updateindex, setUpdateindex] = useState(null)
+  const image = '../images/UI/endpoint/4x/Asset12_4x.png';
+  const setlanguageState = (itemValue) => {
+    dispatch(loginActions.setLanguage(itemValue))
+    console.log(itemValue)
+  }
+  var a = 0
+
+  const updateSecureTextEntry = () => {
+    setData({
+      ...data,
+      secureTextEntry: !data.secureTextEntry,
+    });
+  };
+
+  const fetchData = () => {
+    navigation.dispatch(
+      navigation.replace('SelectScreen', { data: a })
+    )
+  }
+  useEffect(() => {
+    if(databaseReducer.Data.nameser)
+    _onPressSelectbaseValue(databaseReducer.Data.nameser)
+  }, []);
+
+  useEffect(() => {
+    if (route.params?.post) {
+      setBasename(route.params.post.value)
+      setBsaeurl(route.params.post.label)
+    }
+  }, [route.params?.post]);
+  useEffect(() => {
+    if (loginReducer.language &&loginReducer.language != Language.getLang()) {
+      console.log('loginReducer.Language >> ', loginReducer.language)
+      changeLanguage(loginReducer.language);
+      setlanguage(loginReducer.language)
+      RNRestart.Restart();
+    }
+
+    //backsakura 
+  }, [loginReducer.language]);
+  const _onPressSelectbaseValue = async (itemValue) => {
+    console.log(itemValue)
+    setSelectbaseValue(itemValue)
+    if (itemValue != '-1') {
+      for (let i in items) {
+        if (items[i].nameser == itemValue) {
+          setBasename(items[i].nameser)
+          setBsaeurl(items[i].urlser)
+          setUsername(items[i].usernameser)
+          setPassword(items[i].passwordser)
+          setUpdateindex(i)
+        }
+      }
+    } else {
+      setBasename('')
+      setBsaeurl('')
+      setUsername('')
+      setPassword('')
+    }
+  }
+
+  const _onPressSelected = async () => {
+    setLoading(true)
+    for (let i in items) {
+      if (items[i].nameser == selectbaseValue) {
+        dispatch(databaseActions.setData(items[i]));
+        Alert.alert(
+          Language.t('alert.succeed'),
+          Language.t('selectBase.connect') + ' ' + selectbaseValue + ' ' + Language.t('alert.succeed'), [{
+            text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
+              navigation.replace('LoginScreen')
+            )
+          }]);
+
+      }
+    }
+  }
+  const _onPressEdit = () => {
+    a = Math.floor(100000 + Math.random() * 900000);
+    console.log(a)
+    console.log(databaseReducer.Data.nameser)
+    console.log(selectbaseValue)
+    if (databaseReducer.Data.nameser == selectbaseValue) {
+      Alert.alert(
+        Language.t('alert.errorTitle'),
+        Language.t('selectBase.cannotEdit'), [{
+          text: Language.t('alert.ok'), onPress: () => { }
+        }]);
+    } else {
+      navigation.navigate('EditBase', {
+        selectbaseValue: selectbaseValue,
+        data: a
+      });
+    }
+
+  }
+
+  const checkValue = () => {
+    let c = true
+    if (basename == '') {
+
+      c = false
+    }
+    else if (baseurl == '') {
+
+      c = false
+    }
+    else if (username == '') {
+
+      c = false
+    }
+    else if (password == '') {
+
+      c = false
+    }
+    return c
+  }
+  const _onPressUpdate = async (basename, newurl) => {
+    setLoading(true)
+
+    if (checkValue() == true) {
+      await checkIPAddress('-1')
+    }
+  }
+  const _onPressDelete = async () => {
+    setLoading(true)
+
+    let temp = loginReducer.ipAddress;
+    let tempurl = baseurl.split('.dll')
+    let newurl = tempurl[0] + '.dll'
+    if (baseurl == databaseReducer.Data.urlser) {
+      Alert.alert('', Language.t('selectBase.cannotDelete'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+    } else {
+      if (temp.length == 1) {
+        Alert.alert('', Language.t('selectBase.cannotDelete'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      } else {
+        for (let i in loginReducer.ipAddress) {
+          if (loginReducer.ipAddress[i].urlser == baseurl) {
+            Alert.alert('', Language.t('selectBase.questionDelete'), [{
+              text: Language.t('alert.ok'), onPress: () => {
+                temp.splice(i, 1);
+                dispatch(loginActions.ipAddress(temp));
+                fetchData()
+              }
+            }, { text: Language.t('alert.cancel'), onPress: () => { } }]);
             break;
+          }
+        }
+
+      }
+    }
+    setLoading(false)
+  }
+
+  const _onPressAddbase = async () => {
+    setLoading(true)
+    let tempurl = baseurl.split('.dll')
+    let newurl = tempurl[0] + '.dll'
+    let temp = []
+    let check = false;
+    let checktest = false;
+ 
+    if (checkValue() == true) {
+      temp = items;
+      for (let i in items) {
+        if (i != updateindex) {
+          if (items[i].nameser != basename && items[i].urlser == newurl) {
+            checktest = true
+          } else if (items[i].nameser == basename && items[i].urlser != newurl) {
+            checktest = true
+          }
+        }
+      }
+      if (!checktest) {
+        for (let i in items) {
+          if (items[i].nameser == basename && items[i].urlser == newurl) {
+            checkIPAddress('0')
+            check = true;
+          } else {
+            if (
+              items[i].nameser == basename
+            ) {
+              Alert.alert(Language.t('selectBase.Alert'), Language.t('selectBase.Alert2') + Language.t('selectBase.url'), [{
+                text: Language.t('selectBase.yes'), onPress: () => _onPressUpdate(basename, newurl)
+              }, { text: Language.t('selectBase.no'), onPress: () => console.log('cancel Pressed') }]);
+              check = true;
+              break;
+            } else if (
+              items[i].urlser == newurl
+            ) {
+              Alert.alert(Language.t('selectBase.Alert'), Language.t('selectBase.Alert2') + Language.t('selectBase.name'), [{
+                text: Language.t('selectBase.yes'), onPress: () => _onPressUpdate(basename, newurl)
+              }, { text: Language.t('selectBase.no'), onPress: () => console.log('cancel Pressed') }]);
+              check = true;
+              break;
+            }
           }
         }
         if (!check) {
-          let newObj = {label: titleName, value: titleName};
-          temp.push(newObj);
-          dispatch(loginActions.ipAddress(temp));
-          dispatch(userActions.setUserHttp(newObj.label));
-          setShowDialog(false);
-          setTimeout(() => {
-            RNRestart.Restart();
-          }, 1000);
+          checkIPAddress('1')
+        } else {
+          setLoading(false)
         }
-      }
-    }
-  };
-  const handleYes2 = () => {
-    for (let i in loginReducer.ipAddress) {
-      if (loginReducer.ipAddress[i].label == title) {
-        dispatch(userActions.setUserHttp(loginReducer.ipAddress[i].label));
-        setTimeout(() => {
-          RNRestart.Restart();
-        }, 1000);
-      }
-    }
-    setShowDialog2(false);
-  };
-  const handleYes3 = () => {
-    let temp = loginReducer.ipAddress;
-    console.log('title', title);
-    console.log('userReducer.http', userReducer.http);
-    if (title == userReducer.http) {
-      Alert.alert(Language.t('selectBase.cannotDelete'));
-    } else {
-      if (temp.length == 1) {
-        temp = [];
       } else {
-        for (let i in loginReducer.ipAddress) {
-          if (loginReducer.ipAddress[i].label == title) {
-            temp.splice(i, 1);
-            Alert.alert(Language.t('selectBase.questionDelete'));
-            break;
-          }
-        }
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          Language.t('selectBase.Alert3'), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
+        setLoading(false)
       }
+      setLoading(false)
+    } else {
+      Alert.alert(
+        Language.t('alert.errorTitle'),
+        Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      setLoading(false)
     }
 
-    dispatch(loginActions.ipAddress(temp));
-    setShowDialog3(false);
-  };
-  const handleNo = () => {
-    setShowDialog(false);
-    setShowDialog2(false);
-    setShowDialog3(false);
-  };
+  }
 
-  const _OnClickConnect = () => {
-    setShowDialog2(true);
-  };
-  const _OnClickDelete = () => {
-    setShowDialog3(true);
-  };
-  const checkIPAddress = async (url) => {
-    let result = false;
-    await fetch(url + 'DevUsers', {
+
+
+  const checkIPAddress = async (state) => {
+    let tempurl = baseurl.split('.dll')
+    let newurl = tempurl[0] + '.dll'
+    let temp = []
+
+    await fetch(baseurl + '/DevUsers', {
       method: 'POST',
       body: JSON.stringify({
-        'BPAPUS-BPAPSV': '{167f0c96-86fd-488f-94d1-cc3169d60b1a}',
+        'BPAPUS-BPAPSV': loginReducer.serviceID,
         'BPAPUS-LOGIN-GUID': '',
         'BPAPUS-FUNCTION': 'Register',
         'BPAPUS-PARAM':
@@ -156,280 +313,614 @@ const SelectBase = ({navigation, route}) => {
       .then((response) => response.json())
       .then((json) => {
         if (json.ResponseCode == 200 && json.ReasonString == 'Completed') {
-          result = true;
+          fetch(newurl + '/DevUsers', {
+            method: 'POST',
+            body: JSON.stringify({
+              'BPAPUS-BPAPSV': loginReducer.serviceID,
+              'BPAPUS-LOGIN-GUID': '',
+              'BPAPUS-FUNCTION': 'Login',
+              'BPAPUS-PARAM':
+                '{"BPAPUS-MACHINE": "11111122","BPAPUS-USERID": "' +
+                username +
+                '","BPAPUS-PASSWORD": "' +
+                password +
+                '"}',
+            }),
+          })
+            .then((response) => response.json())
+            .then((json) => {
+              if (json && json.ResponseCode == '200') {
+                let newObj = {
+                  nameser: basename,
+                  urlser: newurl,
+                  usernameser: username,
+                  passwordser: password
+                }
+                console.log(json.ResponseCode)
+                if (state == '-1') {
+                  for (let i in loginReducer.ipAddress) {
+                    if (i == updateindex) {
+                      temp.push(newObj)
+                    } else {
+                      temp.push(loginReducer.ipAddress[i])
+                    }
+                  }
+                  dispatch(loginActions.ipAddress(temp))
+                  dispatch(databaseActions.setData(newObj))
+                } else if (state == '1') {
+                  if (items.length > 0) {
+                    for (let i in items) {
+                      temp.push(items[i])
+                    }
+                  }
+                  temp.push(newObj)
+                  dispatch(loginActions.ipAddress(temp))
+                  dispatch(databaseActions.setData(newObj))
+                } else if (state == '0') {
+                  dispatch(databaseActions.setData(newObj))
+                }
+
+                Alert.alert(
+                  Language.t('alert.succeed'),
+                  Language.t('selectBase.connect') + ' ' + basename + ' ' + Language.t('alert.succeed'), [{
+                    text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
+                      navigation.replace('LoginScreen')
+                    )
+                  }]);
+              } else {
+                console.log('Function Parameter Required');
+                let temp_error = 'error_ser.' + json.ResponseCode;
+                console.log('>> ', temp_error)
+                Alert.alert(
+                  Language.t('alert.errorTitle'),
+                  Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
+              }
+              setLoading(false)
+            })
+            .catch((error) => {
+              Alert.alert(
+                Language.t('alert.errorTitle'),
+                Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
+              console.error('_fetchGuidLogin ' + error);
+              setLoading(false)
+            });
         } else {
-          console.log('checkIPAddress FAILED');
-          result = false;
+          console.log('Function Parameter Required');
+          let temp_error = 'error_ser.' + json.ResponseCode;
+          console.log('>> ', temp_error)
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         }
+        setLoading(false)
       })
       .catch((error) => {
-        result = false;
-        console.log('checkIPAddress', error);
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        console.log('checkIPAddress');
+        setLoading(false)
       });
-    return result;
+
+
   };
-  useEffect(() => {
-    let check = false;
-    if (route.params?.post) {
-      setTitleName(
-        Language.t('selectBase.questionAdd') + route.params.post.value + '?',
-      );
-      for (let i in loginReducer.ipAddress) {
-        if (loginReducer.ipAddress[i].value === route.params.post.value) {
-          Alert.alert(Language.t('selectBase.Alert'));
-          check = true;
-          break;
-        }
-      }
-      if (check == false) {
-        setIpAddress(route.params.post.value);
-      }
-    }
-  }, [route.params?.post]);
 
   return (
-    <View style={styles.container2}>
-      <Header
-        style={{
-          backgroundColor: 'white',
-          borderBottomColor: 'gray',
-          borderBottomWidth: 0.7,
-        }}>
-        <Left>
-          <Button transparent onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left" size={20} />
-          </Button>
-        </Left>
-        <Body>
-          <Title style={{color: 'black', width: 250}}>
-            {Language.t('selectBase.header')}
-          </Title>
-        </Body>
-        <Right />
-      </Header>
-      <View style={styles.container1}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
+    <View style={container1}>
+
+
+      <View style={tabbar}>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}>
+            <FontAwesome name="arrow-left" style={{ color: Colors.backgroundLoginColorSecondary, }} size={FontSize.large} />
+          </TouchableOpacity>
           <Text
             style={{
-              flex: 0.5,
+              marginLeft: 12,
               fontSize: FontSize.medium,
-            }}>
-            {Language.t('selectBase.title')}
-          </Text>
-          <View
-            style={{
-              marginLeft: Platform.OS === 'android' ? 5 : 1,
-              borderWidth: 0.5,
-              flex: 1,
-            }}>
-            <Picker
-              selectedValue={title}
-              style={{
-                width: deviceWidth,
-              }}
-              onValueChange={(item) => {
-                setTitle(item);
-              }}
-              mode="dropdown"
-              itemStyle={{}}>
-              {loginReducer.ipAddress.length > 0 ? (
-                loginReducer.ipAddress.map((obj, index) => {
-                  return (
-                    <Picker.Item
-                      key={obj.label}
-                      label={obj.value}
-                      value={obj.label}
-                    />
-                  );
-                })
-              ) : (
-                <Picker.Item
-                  value="-1"
-                  label={Language.t('selectBase.lebel')}
-                />
-              )}
-            </Picker>
-          </View>
+              color: Colors.backgroundLoginColorSecondary,
+            }}> {Language.t('selectBase.header')}</Text>
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignContent: 'flex-end',
-            justifyContent: 'flex-end',
-            marginTop: Platform.OS === 'ios' ? 15 : 10,
-          }}>
-          <TouchableOpacity
-            onPress={_OnClickConnect}
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              marginEnd: 5,
-              backgroundColor: Colors.buttonColorPrimary,
-            }}>
-            <Text style={{color: 'white', fontWeight: '500'}}>
-              {Language.t('selectBase.connect')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={_OnClickDelete}
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 15,
-              backgroundColor: 'red',
-            }}>
-            <Text style={{color: 'white', fontWeight: '500'}}>
-              {Language.t('selectBase.delete')}
-            </Text>
-          </TouchableOpacity>
+        <View>
+          <Picker
+            selectedValue={selectlanguage}
+            style={{ color: Colors.backgroundLoginColorSecondary, width: 110 }}
+            mode="dropdown"
+            onValueChange={(itemValue, itemIndex) => Alert.alert('', Language.t('menu.changeLanguage'), [{ text: Language.t('alert.ok'), onPress: () => setlanguageState(itemValue) }, { text: Language.t('alert.cancel'), onPress: () => { } }])} >
+            <Picker.Item label="TH" value="th" />
+            <Picker.Item label="EN" value="en" />
+          </Picker>
         </View>
-
-        <Text
-          style={{
-            fontSize: FontSize.medium,
-          }}>
-          {Language.t('selectBase.add')}
-        </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 5,
-            marginTop: Platform.OS === 'ios' ? 15 : 10,
-            borderColor: Colors.borderColor,
-            borderWidth: 0.7,
-          }}>
-          <TextInput
-            style={{
-              flex: 1,
-              color: Colors.fontColor,
-              fontSize: FontSize.medium,
-            }}
-            keyboardType="default"
-            placeholderTextColor={Colors.fontColorSecondary}
-            placeholder={titleName == 'IP Address:' ? titleName : ipAddress}
-            onChangeText={(val) => {
-              if (val == '') {
-                setTitleName('IP Address:');
-              } else {
-                setTitleName(val);
-              }
-            }}
-          />
-          <TouchableOpacity onPress={() => navigation.navigate('ScanScreen')}>
-            <Icon name="qrcode" size={25} color={'black'} />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            if (titleName == '') {
-              Alert.alert(Language.t('selectBase.Alert3'));
-            } else {
-              setShowDialog(true);
-            }
-          }}>
-          <View style={styles.button}>
-            <Text style={styles.textButton}>
-              {Language.t('selectBase.add')}
-            </Text>
-          </View>
-        </TouchableOpacity>
-        <Dialog.Container visible={isShowDialog}>
-          <Dialog.Title>{titleName}</Dialog.Title>
-          <Dialog.Description>
-            {Language.t('selectBase.Alert2')}
-          </Dialog.Description>
-          <Dialog.Button
-            label={Language.t('alert.cancel')}
-            onPress={handleNo}
-          />
-          <Dialog.Button label={Language.t('alert.ok')} onPress={handleYes} />
-        </Dialog.Container>
-        <Dialog.Container visible={isShowDialog2}>
-          <Dialog.Title>{Language.t('selectBase.Alert2')}</Dialog.Title>
-          <Dialog.Description>
-            {Language.t('selectBase.Alert2')}
-          </Dialog.Description>
-          <Dialog.Button
-            label={Language.t('alert.cancel')}
-            onPress={handleNo}
-          />
-          <Dialog.Button label={Language.t('alert.ok')} onPress={handleYes2} />
-        </Dialog.Container>
-        <Dialog.Container visible={isShowDialog3}>
-          <Dialog.Title>{Language.t('selectBase.questionDelete')}</Dialog.Title>
-          <Dialog.Button
-            label={Language.t('alert.cancel')}
-            onPress={handleNo}
-          />
-          <Dialog.Button label={Language.t('alert.ok')} onPress={handleYes3} />
-        </Dialog.Container>
       </View>
+
+      <ScrollView>
+        <SafeAreaView >
+          <KeyboardAvoidingView >
+            <View style={styles.body}>
+
+              <View style={styles.body1}>
+                <Text style={styles.textTitle}>
+                  {Language.t('selectBase.title')} :
+                </Text>
+              </View>
+              <View style={{
+                marginTop: 10, flexDirection: 'row',
+                justifyContent: 'center', borderColor: items.length > 0 ? Colors.borderColor : '#979797', backgroundColor: Colors.backgroundColorSecondary, borderWidth: 1, padding: 10, borderRadius: 10,
+              }}>
+
+                <Text style={{ fontSize: FontSize.large }}></Text>
+
+                {items.length > 0 ? (
+                  <Picker
+                    selectedValue={selectbaseValue}
+                    enabled={true}
+                    mode="dropdown"
+                    state={{ color: Colors.borderColor, backgroundColor: Colors.backgroundColorSecondary }}
+                    onValueChange={(itemValue, itemIndex) => _onPressSelectbaseValue(itemValue)}>
+                    {items.map((obj, index) => {
+                      return (
+                        <Picker.Item label={obj.nameser} color={Colors.borderColor} value={obj.nameser} />
+                      )
+                    })}
+                    {
+                      <Picker.Item
+                        value="-1"
+                        color={"#979797"}
+                        label={Language.t('selectBase.lebel')}
+                      />
+                    }
+                  </Picker>
+                ) : (
+                  <Picker
+                    selectedValue={selectbaseValue}
+                    state={{ color: Colors.borderColor, backgroundColor: Colors.borderColor }}
+                    onValueChange={(itemValue, itemIndex) => _onPressSelectbaseValue(itemValue)}
+                    enabled={false}
+                    mode="dropdown"
+
+                  >
+                    {
+                      <Picker.Item
+                        value="-1"
+                        color={"#979797"}
+                        label={Language.t('selectBase.lebel')}
+                      />
+                    }
+                  </Picker>
+                )}
+              </View>
+
+
+              <View style={{ marginTop: 10 }}>
+                <Text style={styles.textTitle}>
+                  {Language.t('selectBase.name')} :
+                </Text>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <View
+                  style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    flexDirection: 'column',
+                    height: 50,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+
+
+                  }}>
+                  <View style={{ height: 30, flexDirection: 'row' }}>
+                    <Image
+                      style={{ height: 30, width: 30 }}
+                      resizeMode={'contain'}
+                      source={require('../images/UI/endpoint/4x/Asset18_4x.png')}
+                    />
+                    <TextInput
+                      style={{
+                        flex: 8,
+                        marginLeft: 10,
+                        borderBottomColor: Colors.borderColor,
+                        color: Colors.fontColor,
+                        paddingVertical: 3,
+                        fontSize: FontSize.medium,
+                        borderBottomWidth: 0.7,
+                      }}
+
+                      placeholderTextColor={Colors.fontColorSecondary}
+
+                      placeholder={Language.t('selectBase.name') + '..'}
+                      value={basename}
+                      onChangeText={(val) => {
+                        setBasename(val);
+                      }}></TextInput>
+                    <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => navigation.navigate('ScanScreen', { route: 'SelectScreen' })}>
+
+                      <FontAwesome
+                        name="qrcode"
+                        size={25}
+                        color={Colors.borderColor}
+                      />
+
+                    </TouchableOpacity>
+
+                  </View>
+                </View>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <Text style={styles.textTitle}>
+                  {Language.t('selectBase.url')} :
+                </Text>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <View
+                  style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    flexDirection: 'column',
+                    height: 50,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    height: 'auto',
+                    paddingBottom: 10
+
+                  }}>
+                  <View style={{ height: 'auto', flexDirection: 'row' }}>
+                    <Image
+                      style={{ height: 30, width: 30 }}
+                      resizeMode={'contain'}
+                      source={require('../images/UI/endpoint/4x/Asset19_4x.png')}
+                    />
+                    <TextInput
+                      style={{
+                        flex: 8,
+                        marginLeft: 10,
+                        borderBottomColor: Colors.borderColor,
+                        color: Colors.fontColor,
+                        paddingVertical: 3,
+                        fontSize: FontSize.medium,
+                        height: 'auto',
+                        borderBottomWidth: 0.7,
+                      }}
+                      multiline={true}
+                      placeholderTextColor={Colors.fontColorSecondary}
+
+                      value={baseurl}
+                      placeholder={Language.t('selectBase.url') + '..'}
+                      onChangeText={(val) => {
+                        setBsaeurl(val);
+                      }}></TextInput>
+
+                  </View>
+                </View>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <Text style={styles.textTitle}>
+                  {Language.t('login.username')} :
+                </Text>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <View
+                  style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    flexDirection: 'column',
+                    height: 50,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10
+                  }}>
+                  <View style={{ height: 30, flexDirection: 'row' }}>
+                    <Image
+                      style={{ height: 30, width: 30 }}
+                      resizeMode={'contain'}
+                      source={require('../images/UI/endpoint/4x/Asset20_4x.png')}
+                    />
+                    <TextInput
+                      style={{
+                        flex: 8,
+                        marginLeft: 5,
+                        borderBottomColor: Colors.borderColor,
+                        color: Colors.fontColor,
+                        paddingVertical: 3,
+                        fontSize: FontSize.medium,
+                        borderBottomWidth: 0.7,
+                      }}
+
+                      placeholderTextColor={Colors.fontColorSecondary}
+
+                      value={username}
+                      placeholder={Language.t('login.username') + '..'}
+                      onChangeText={(val) => {
+                        setUsername(val);
+                      }}></TextInput>
+
+                  </View>
+                </View>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <Text style={styles.textTitle}>
+                  {Language.t('login.password')} :
+                </Text>
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <View
+                  style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    flexDirection: 'column',
+                    height: 50,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10
+                  }}>
+                  <View style={{ height: 30, flexDirection: 'row' }}>
+                    <Image
+                      style={{ height: 30, width: 30 }}
+                      resizeMode={'contain'}
+                      source={require('../images/UI/endpoint/4x/Asset21_4x.png')}
+                    />
+                    <TextInput
+                      style={{
+                        flex: 8,
+                        marginLeft: 5,
+                        color: Colors.fontColor,
+                        paddingVertical: 3,
+                        fontSize: FontSize.medium,
+                        borderBottomColor: Colors.borderColor,
+                        borderBottomWidth: 0.7,
+                      }}
+                      secureTextEntry={data.secureTextEntry ? true : false}
+                      keyboardType="default"
+
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      placeholder={Language.t('login.password') + '..'}
+                      value={password}
+                      onChangeText={(val) => {
+                        setPassword(val);
+                      }}
+                    />
+
+                    <TouchableOpacity style={{ marginLeft: 10 }} onPress={updateSecureTextEntry}>
+                      {data.secureTextEntry ? (
+                        <FontAwesome
+                          name="eye-slash"
+                          size={25}
+                          color={Colors.borderColor}
+                        />
+                      ) : (
+                        <FontAwesome
+                          name="eye"
+                          size={25}
+                          color={Colors.borderColor} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+
+              <View style={styles.body1e}>
+                <TouchableNativeFeedback
+                  onPress={() => _onPressAddbase()}>
+                  <View
+                    style={{
+                      borderRadius: 10,
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      height: 50,
+                      marginRight: 10, width: deviceWidth - 200,
+                      backgroundColor: Colors.buttonColorPrimary,
+                    }}>
+                    <Text
+                      style={{
+                        color: Colors.buttonTextColor,
+                        alignSelf: 'center',
+                        fontSize: FontSize.medium,
+                        fontWeight: 'bold',
+                      }}>
+                      {Language.t('selectBase.saveandconnect')}
+                    </Text>
+                  </View>
+                </TouchableNativeFeedback>
+
+                {items.length > 0 ? (
+
+                  <TouchableNativeFeedback
+                    onPress={() => _onPressDelete()}>
+                    <View
+                      style={{
+                        borderRadius: 10,
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        height: 50,
+                        width: deviceWidth - 250,
+                        backgroundColor: Colors.backgroundLoginColor,
+                      }}>
+                      <Text
+                        style={{
+                          color: Colors.backgroundColorSecondary,
+                          alignSelf: 'center',
+                          fontSize: FontSize.medium,
+                          fontWeight: 'bold',
+                        }}>
+                        {Language.t('selectBase.delete')}
+                      </Text>
+                    </View>
+                  </TouchableNativeFeedback>
+
+                ) : (
+
+                  <TouchableNativeFeedback
+                    onPress={() => null}>
+                    <View
+                      style={{
+                        borderRadius: 10,
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        height: 50,
+                        width: deviceWidth - 250,
+                        backgroundColor: '#979797',
+                      }}>
+                      <Text
+                        style={{
+                          color: '#C5C5C5',
+                          alignSelf: 'center',
+                          fontSize: FontSize.medium,
+                          fontWeight: 'bold',
+
+                        }}>
+                        {Language.t('selectBase.delete')}
+                      </Text>
+                    </View>
+                  </TouchableNativeFeedback>
+                )}
+
+              </View>
+            </View>
+
+          </KeyboardAvoidingView>
+
+        </SafeAreaView>
+      </ScrollView>
+
+
+      {loading && (
+        <View
+          style={{
+            width: deviceWidth,
+            height: deviceHeight,
+            opacity: 0.5,
+            backgroundColor: Colors.backgroundColorSecondary,
+            alignSelf: 'center',
+            justifyContent: 'center',
+            alignContent: 'center',
+            position: 'absolute',
+          }}>
+          <ActivityIndicator
+            style={{
+              borderRadius: 15,
+              backgroundColor: null,
+              width: 100,
+              height: 100,
+              alignSelf: 'center',
+            }}
+            animating={loading}
+            size="large"
+            color={Colors.lightPrimiryColor}
+          />
+        </View>
+      )}
+
     </View>
-  );
-};
+  )
+}
+
 const styles = StyleSheet.create({
   container1: {
-    backgroundColor: Colors.backgroundColorSecondary,
-    padding: 20,
-
-    flexDirection: 'column',
-  },
-  container2: {
-    backgroundColor: 'white',
+    backgroundColor: '#C8FFFF',
     flex: 1,
+
+  },
+  body: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop:20
+  },
+  body1e: {
+    marginTop: 20, marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'center'
+
+  },
+  body1: {
+    marginTop: 10,
+    flexDirection: "row",
+  },
+  tabbar: {
+    height: 70,
+    padding: 12,
+    paddingLeft: 20,
+    alignItems: 'center',
+backgroundColor:'#182626',
+
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+  },
+  image: {
+    flex: 1,
+    justifyContent: "center"
+  },
+  dorpdown: {
+    justifyContent: 'center',
+    fontSize: FontSize.medium,
+  },
+  dorpdownTop: {
+    justifyContent: 'flex-end',
+    fontSize: FontSize.medium,
+  },
+  textTitle: {
+    fontSize: FontSize.medium,
+    fontWeight: 'bold',
+    color: Colors.fontColor,
+  },
+  imageIcon: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topImage: {
+    height: deviceHeight / 3,
+    width: deviceWidth,
+
   },
   button: {
     marginTop: 10,
     marginBottom: 25,
-    padding: 10,
+    padding: 5,
     alignItems: 'center',
     backgroundColor: Colors.buttonColorPrimary,
     borderRadius: 10,
   },
-  textTitle: {
-    marginTop: Platform.OS === 'ios' ? 20 : 10,
-    fontSize: FontSize.medium,
-    fontWeight: 'bold',
-    color: Colors.fontColor,
-  },
-  textTitle2: {
-    alignSelf: 'center',
-    flex: 2,
-    fontSize: FontSize.medium,
-    fontWeight: 'bold',
-    color: Colors.fontColor,
-  },
   textButton: {
-    fontSize: FontSize.medium,
+    fontSize: FontSize.large,
     color: Colors.fontColor2,
   },
-  textInput: {
-    flex: 8,
-    borderBottomColor: Colors.borderColor,
-    color: Colors.inputText,
-    marginTop: Platform.OS === 'ios' ? 18 : 1,
-    fontSize: FontSize.medium,
-    borderBottomWidth: 0.7,
+  buttonContainer: {
+    marginTop: 10,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    marginLeft: 10,
+    marginBottom: 20,
+  },
+  checkbox: {
+    alignSelf: "center",
+    borderBottomColor: '#ffff',
+    color: '#ffff',
+  },
+  label: {
+    margin: 8,
+    color: '#ffff',
   },
 });
-
 const mapStateToProps = (state) => {
   return {
-    http: state.userReducer.http,
-    ipAddress: state.loginReducer.ipAddress,
+
+
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    reduxSetUserHttp: (payload) => dispatch(setUserHttp(payload)),
-    reduxIpAddress: (payload) => dispatch(ipAddress(payload)),
+
+    reduxMachineNum: (payload) => dispatch(registerActions.machine(payload)),
+
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(SelectBase);

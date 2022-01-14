@@ -29,6 +29,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 const InterestScreen = () => {
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const loginReducer = useSelector(({loginReducer}) => loginReducer);
   const interestReducer = useSelector(({interestReducer}) => interestReducer);
   const [selectedId, setSelectedId] = useState(null);
@@ -83,7 +84,7 @@ const InterestScreen = () => {
   };
 
   const fetchData = async () => {
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -104,7 +105,7 @@ const InterestScreen = () => {
         let responseData = JSON.parse(json.ResponseData);
         let h = [];
         for (let i in responseData.SHOWPAGE) {
-          await fetch(userReducer.http + 'ECommerce', {
+          await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
               'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -303,7 +304,7 @@ const InterestScreen = () => {
         }}>
         <Left>
           <Button transparent onPress={() => navigation.goBack()}>
-            <Icon size={35} name="angle-left" />
+            <Icon size={35}  name="angle-left" />
           </Button>
         </Left>
         <Body>

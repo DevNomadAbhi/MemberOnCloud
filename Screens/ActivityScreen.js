@@ -14,7 +14,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {connect} from 'react-redux';
 import {FontSize} from '../components/FontSizeHelper';
 import RNFetchBlob from 'rn-fetch-blob';
-import * as ActivityActions from '../src/actions/activityActions';
+import * as activityActions from '../src/actions/activityActions';
 import {useNavigation} from '@react-navigation/native';
 
 const Item = ({item, onPress, style}) => (

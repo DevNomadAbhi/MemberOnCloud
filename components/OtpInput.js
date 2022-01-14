@@ -32,26 +32,32 @@ class OtpInput extends PureComponent {
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: FontSize.xlarge,
-                      width: FontSize.xlarge,
+                      height: 40,
+                      width: 40,
                       marginRight: 10,
                       marginLeft: 10,
+                      
                     }}>
                     <Icon
+                      style={{
+                        fontSize: FontSize.large,
+                        color: Colors.textColor,
+                      }}
                       type="Ionicons"
                       android="md-radio-button-on"
                       ios="ios-radio-button-on"
                     />
+
                   </View>
                 ) : (
                   <View
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
-                      borderWidth: 1,
+                      borderBottomWidth: 1,
                       borderColor: Colors.textColor,
-                      height: FontSize.xlarge,
-                      width: FontSize.xlarge,
+                      height: 40,
+                      width: 40,
                       marginRight: 10,
                       marginLeft: 10,
                     }}>
@@ -75,8 +81,8 @@ class OtpInput extends PureComponent {
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: FontSize.xlarge,
-                      width: FontSize.xlarge,
+                      height: 40,
+                      width: 40,
                       marginRight: 10,
                       marginLeft: 10,
                     }}>
@@ -91,10 +97,10 @@ class OtpInput extends PureComponent {
                     style={{
                       justifyContent: 'center',
                       alignItems: 'center',
-                      borderWidth: 1,
+                      borderBottomWidth: 1,
                       borderColor: Colors.textColor,
-                      height: FontSize.xlarge,
-                      width: FontSize.xlarge,
+                      height: 40,
+                      width: 40,
                       marginRight: 10,
                       marginLeft: 10,
                     }}

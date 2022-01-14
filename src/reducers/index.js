@@ -5,13 +5,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 import loginReducer from './loginReducer';
 import registerReducer from './registerReducer';
 import redeemReducer from './redeemReducer';
+import promotionReducer from './promotionReducer';
 import activityReducer from './activityReducer';
 import notiReducer from './notiReducer';
 import contactUsReducer from './contactUsReducer';
 import interestReducer from './interestReducer';
 import signoutReducer from './signoutReducer';
 import campaignReducer from './campaignReducer';
-import userReducer from './userReducer'
+import userReducer from './userReducer';
+import databaseReducer from './databaseReducer';
 // Redux: Root Reducer
 const appReducer = combineReducers({
   activityReducer: activityReducer,
@@ -20,10 +22,12 @@ const appReducer = combineReducers({
   loginReducer: loginReducer,
   notiReducer: notiReducer,
   redeemReducer: redeemReducer,
+  promotionReducer: promotionReducer,
   registerReducer: registerReducer,
   signoutReducer: signoutReducer,
   campaignReducer: campaignReducer,
-  userReducer:userReducer
+  userReducer:userReducer,
+  databaseReducer:databaseReducer,
 });
 const rootReducer = (state, action) => {
   if (action.type === 'SIGNOUT_REQUEST') {

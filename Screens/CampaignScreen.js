@@ -74,6 +74,8 @@ const Item = ({item, onPress, style}) => {
 const CampaignScreen = () => {
   const loginReducer = useSelector(({loginReducer}) => loginReducer);
   const userReducer = useSelector(({userReducer}) => userReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
+
   const [arrayObj, setArrayObj] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const dispatch = useDispatch();
@@ -92,7 +94,7 @@ const CampaignScreen = () => {
   const fetchData = async () => {
     let arrayName = [];
     let arrayGuid = [];
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -134,7 +136,7 @@ const CampaignScreen = () => {
     setTempB((item) => (b = item));
     setTempC((item) => (c = item));
 
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,

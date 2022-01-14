@@ -22,6 +22,7 @@ const deviceHeight = Dimensions.get('window').height;
 const ContactUsScreen = () => {
   const dispatch = useDispatch();
   const [explains, setExplains] = useState([]);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const contactUsReducer = useSelector(
     ({contactUsReducer}) => contactUsReducer,
   );
@@ -55,7 +56,7 @@ const ContactUsScreen = () => {
   };
   const fetchData = async () => {
     let arrayGuid = [];
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -89,7 +90,7 @@ const ContactUsScreen = () => {
     let arrayName = [];
     let arrayExplain = [];
     for (let i in guid) {
-      await fetch(userReducer.http + 'ECommerce', {
+      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,

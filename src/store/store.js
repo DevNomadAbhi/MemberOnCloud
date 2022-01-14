@@ -25,6 +25,7 @@ const persistConfig = {
     'campaignReducer',
     'userReducer',
     'interestReducer',
+    'databaseReducer',
   ],
   // Blacklist (Don't Save Specific Reducers)
   blacklist: ['signoutReducer'],

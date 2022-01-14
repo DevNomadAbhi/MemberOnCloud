@@ -24,7 +24,7 @@ import ImagePicker from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Language } from '../translations/I18n';
 import * as loginActions from '../src/actions/loginActions';
-import * as ActivityActions from '../src/actions/activityActions';
+import * as activityActions from '../src/actions/activityActions';
 import * as userActions from '../src/actions/userActions';
 import Colors from '../src/Colors';
 const deviceWidth = Dimensions.get('screen').width;
@@ -33,6 +33,7 @@ const deviceHeight = Dimensions.get('screen').height;
 const HomeScreen = () => {
   const navigation = useNavigation();
   const userReducer = useSelector(({ userReducer }) => userReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const activityReducer = useSelector(({ activityReducer }) => activityReducer);
   const [selectedId, setSelectedId] = useStateIfMounted(null);
@@ -68,9 +69,10 @@ const HomeScreen = () => {
   }, []);
   useEffect(() => {
     console.log(` `)
-    console.log(`loginReducer.jsonResult`)
+    console.log(`loginReducer.jsonResult ${databaseReducer.Data.urlser}`)
     for (var i in loginReducer.jsonResult){
       console.log(` loginReducer.jsonResult[${i}].guid >> ${loginReducer.jsonResult[i].guid}`)
+      console.log(` ${loginReducer.jsonResult[i].img}`)
       console.log(` `)
     }
     console.log(` `)
@@ -114,7 +116,7 @@ const HomeScreen = () => {
 
   const fetchDataPopUpImg = async () => {
     let ra = [];
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -147,7 +149,7 @@ const HomeScreen = () => {
   const fetchActivityData = async () => {
     let arrayName = [];
     let arrayGuid = [];
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -176,8 +178,8 @@ const HomeScreen = () => {
             arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
           }
         }
-        dispatch(ActivityActions.LOguid(arrayGuid));
-        dispatch(ActivityActions.LOresult(responseData));
+        dispatch(activityActions.LOguid(arrayGuid));
+        dispatch(activityActions.LOresult(responseData));
       })
       .catch((error) => {
         console.error('fetchActivityData: ' + error);
@@ -281,7 +283,7 @@ const HomeScreen = () => {
       }
     }
     setArrayObj(arrayResult);
-    dispatch(ActivityActions.LOname(arrayResult));
+    dispatch(activityActions.LOname(arrayResult));
   };
 
   const stack = async () => {
@@ -296,7 +298,7 @@ const HomeScreen = () => {
   const fetchActivityPage = async (ra3) => {
     let redeemGuid = [];
     for (let i in ra3) {
-      await fetch(userReducer.http + 'ECommerce', {
+      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -329,7 +331,7 @@ const HomeScreen = () => {
         .catch((error) => {
           console.error('fetchPage: ' + error);
         });
-      dispatch(ActivityActions.PageGuid(redeemGuid));
+      dispatch(activityActions.PageGuid(redeemGuid));
     }
     return redeemGuid;
   };
@@ -474,7 +476,7 @@ const HomeScreen = () => {
                 uri: menuImg.length
                   ? Platform.OS === 'ios'
                     ? menuImg[2].img
-                    : menuImg[2].img
+                    : 'file://' +menuImg[2].img
                   : null,
               }}></Image>
             <Text style={{ color: 'black' }}>
@@ -749,7 +751,7 @@ const HomeScreen = () => {
               <Icon
                 onPress={() => {
                   setShowPopUp(false);
-                  dispatch(ActivityActions.ConName(popUpCheck.check));
+                  dispatch(activityActions.ConName(popUpCheck.check));
                 }}
                 name="times-circle"
                 size={25}

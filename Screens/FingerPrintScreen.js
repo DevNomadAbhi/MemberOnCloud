@@ -41,8 +41,7 @@ const FingerPrintScreen = () => {
     if (!re) {
       toggleSwitch();
       Alert.alert(
-        Language.t('alert.errorTitle'),
-      );
+       '', Language.t('alert.errorTitle'),[{text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed')},]);
     }
   };
 

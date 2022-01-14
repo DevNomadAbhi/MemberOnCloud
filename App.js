@@ -1,15 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {PersistGate} from 'redux-persist/es/integration/react';
-import {Provider} from 'react-redux';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Button, Text, View, Image} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { PersistGate } from 'redux-persist/es/integration/react';
+import { Provider } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, HeaderBackground } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Button, Text, View, Image } from 'react-native';
 import PersonalInfoScreen from './Screens/PersonalInfoScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import InstructionScreen from './Screens/InstructionScreen';
 import HomeScreen from './Screens/HomeScreen';
-import {useStateIfMounted} from 'use-state-if-mounted';
+import { useStateIfMounted } from 'use-state-if-mounted';
 import Mycard from './Screens/MyCardScreen';
 import Campaign from './Screens/CampaignScreen';
 import AboutCard from './Screens/AboutCardScreen';
@@ -17,9 +17,9 @@ import Activity from './Screens/ActivityScreen';
 import DetailScreen from './Screens/DetailScreen';
 import SelectLanguageScreen from './Screens/SelectLanguageScreen';
 import HelperScreen from './Screens/HelperScreen';
-import {store, persistor} from './src/store/store';
-import {Language, changeLanguage} from './translations/I18n';
-import {useSelector} from 'react-redux';
+import { store, persistor } from './src/store/store';
+import { Language, changeLanguage } from './translations/I18n';
+import { useSelector } from 'react-redux';
 import {
   Container,
   Header,
@@ -34,7 +34,7 @@ import {
 
 //import Contact from './Screens/ContactScreen';
 import Redeem from './Screens/RedeemScreen';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import LoginScreen from './Screens/LoginScreen';
 import InterestScreen from './Screens/InterestScreen';
 import NotiScreen from './Screens/NotiScreen';
@@ -51,22 +51,22 @@ function DetailsStackScreen() {
   return (
     <DetailStack.Navigator>
       <DetailStack.Screen
-        options={{headerTitle: Language.t('menu.header'), headerShown: false}}
+        options={{ headerTitle: Language.t('menu.header'), headerShown: false }}
         name="DetailScreen"
         component={DetailScreen}
       />
       <DetailStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="PersonalInfoScreen"
         component={PersonalInfoStackScreen}
       />
       <DetailStack.Screen
-        options={{headerTitle: Language.t('changeLanguage.header')}}
+        options={{ headerTitle: Language.t('changeLanguage.header') }}
         name="SelectLanguageScreen"
         component={SelectLanguageScreen}
       />
       <DetailStack.Screen
-        options={{headerTitle: Language.t('fingerPrint.header')}}
+        options={{ headerTitle: Language.t('fingerPrint.header') }}
         name="FingerPrintScreen"
         component={FingerPrintScreen}
       />
@@ -79,12 +79,12 @@ function PersonalInfoStackScreen() {
   return (
     <PersonalInfoStack.Navigator>
       <PersonalInfoStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="PersonalInfoScreen"
         component={PersonalInfoScreen}
       />
       <PersonalInfoStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="AuthenticationScreen"
         component={AuthenticationScreen}
       />
@@ -97,17 +97,18 @@ function LoginStackScreen() {
   return (
     <LoginStack.Navigator>
       <LoginStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="LoginScreen"
         component={LoginScreen}
       />
       <LoginStack.Screen
-        options={{headerShown: false}}
-        name="SelectBaseScreen"
+        options={{ headerShown: false }}
+        name="SelectScreen"
         component={SelectBase}
       />
       <LoginStack.Screen
-        options={{title: Language.t('selectBase.scanQR'), headerLeft: ''}}
+        options={{ title: Language.t('selectBase.scanQR'), headerLeft: '' }}
+        options={{ headerShown: false }}
         name="ScanScreen"
         component={ScanScreen}
       />
@@ -120,12 +121,12 @@ function RegisterStackScreen() {
   return (
     <RegisterStack.Navigator mode="modal">
       <RegisterStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="RegisterScreen"
         component={RegisterScreen}
       />
       <RegisterStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="AuthenticationScreen"
         component={AuthenticationScreen}
       />
@@ -138,12 +139,12 @@ function RedeemStackScreen() {
   return (
     <RedeemStack.Navigator>
       <RedeemStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="RedeemScreen"
         component={Redeem}
       />
       <RedeemStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="ActivityPage"
         component={ActivityPage}
       />
@@ -156,12 +157,12 @@ function NotiStackScreen() {
   return (
     <NotiStack.Navigator>
       <NotiStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="NotiScreen"
         component={NotiScreen}
       />
       <NotiStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="ActivityPage"
         component={ActivityPage}
       />
@@ -174,12 +175,12 @@ function ActivityStackScreen() {
   return (
     <ActivityStack.Navigator>
       <ActivityStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="ActivityScreen"
         component={Activity}
       />
       <ActivityStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="ActivityPage"
         component={ActivityPage}
       />
@@ -192,12 +193,12 @@ function ActivityHomeStackScreen() {
   return (
     <ActivityHomeStack.Navigator>
       <ActivityHomeStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="HomeScreen"
         component={HomeScreen}
       />
       <ActivityHomeStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="ActivityPage2"
         component={ActivityPage2}
       />
@@ -209,7 +210,7 @@ function MenusStackScreen() {
   return (
     <MenuStack.Navigator>
       <MenuStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="Menu"
         component={ActivityHomeStackScreen}
       />
@@ -239,13 +240,13 @@ function MenusStackScreen() {
         component={AboutCard}
       />
       <MenuStack.Screen
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
         name="PersonalInfo"
         component={PersonalInfoStackScreen}
       />
 
       <MenuStack.Screen
-        options={{headerBackTitle: ' ', headerTitle: Language.t('main.feeds')}}
+        options={{ headerBackTitle: ' ', headerTitle: Language.t('main.feeds') }}
         name="Activity"
         component={ActivityStackScreen}
       />
@@ -258,7 +259,7 @@ function MenusStackScreen() {
         component={ContactUs}
       />
       <MenuStack.Screen
-        options={{headerBackTitle: ' ', headerTitle: Language.t('main.redeem')}}
+        options={{ headerBackTitle: ' ', headerTitle: Language.t('main.redeem') }}
         name="Redeem"
         component={RedeemStackScreen}
       />
@@ -277,8 +278,8 @@ function MenusStackScreen() {
 const BottomTabs = createBottomTabNavigator();
 const tabs = () => (
   <BottomTabs.Navigator
-    screenOptions={({route}) => ({
-      tabBarIcon: ({focused}) => {
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused }) => {
         if (route.name === 'Home') {
           return (
             <Image
@@ -351,8 +352,8 @@ const tabs = () => (
 );
 const MainStack = createStackNavigator();
 const App = () => {
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
-  const userReducer = useSelector(({userReducer}) => userReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
+  const userReducer = useSelector(({ userReducer }) => userReducer);
   const [userIndex, setUserIndex] = useStateIfMounted(loginReducer.index);
   useEffect(() => {
     if (userIndex == '-1') {
@@ -365,25 +366,25 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer>
-          <SafeAreaView style={{flex: 1}}>
+          <SafeAreaView style={{ flex: 1 }}>
             <MainStack.Navigator>
               <MainStack.Screen
-                options={{headerShown: false}}
+                options={{ headerShown: false }}
                 name="LoginScreen"
                 component={LoginStackScreen}
               />
               <MainStack.Screen
-                options={{headerShown: false}}
+                options={{ headerShown: false }}
                 name="RegisterScreen"
                 component={RegisterStackScreen}
               />
               <MainStack.Screen
-                options={{headerShown: false}}
+                options={{ headerShown: false }}
                 name="InterestScreen"
                 component={InterestScreen}
               />
               <MainStack.Screen
-                options={{headerShown: false}}
+                options={{ headerShown: false }}
                 name="BottomTabs"
                 component={tabs}
               />

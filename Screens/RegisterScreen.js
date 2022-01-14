@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,41 +7,47 @@ import {
   Platform,
   Alert,
   StyleSheet,
+  ActivityIndicator,
   Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback
 } from 'react-native';
 import moment from 'moment';
 import DatePicker from '../components/DatePicker';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Header, Button, Body, Picker, Left, Right, Title} from 'native-base';
-import {Language} from '../translations/I18n';
-import {useNavigation} from '@react-navigation/native';
-import {connect} from 'react-redux';
-import {FontSize} from '../components/FontSizeHelper';
-import {DateHelper} from '../components/DateHelper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Header, Button, Body, Left, Right, Title } from 'native-base';
+import { Language } from '../translations/I18n';
+import { useNavigation } from '@react-navigation/native';
+import { connect } from 'react-redux';
+import { FontSize } from '../components/FontSizeHelper';
+import { DateHelper } from '../components/DateHelper';
 import DeviceInfo from 'react-native-device-info';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import * as Constants from '../src/Constants';
+import { useStateIfMounted } from 'use-state-if-mounted';
 import Colors from '../src/Colors';
 import {
   TouchableNativeFeedback,
   TouchableOpacity,
   ScrollView,
 } from 'react-native-gesture-handler';
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import * as registerActions from '../src/actions/registerActions';
 import * as userActions from '../src/actions/userActions';
 const deviceWidth = Dimensions.get('screen').width;
 const deviceHeight = Dimensions.get('screen').height;
 const RegisterScreen = () => {
+  const [loading, setLoading] = useStateIfMounted(false);
   const navigation = useNavigation();
   const [date, setDate] = useState(moment().format('YYYYMMDD'));
   const [rePass, setRePass] = useState('');
   const [resultJson, setResultJson] = useState('');
   const [GUID, setGUID] = useState('');
   const [machineNo, setMachineNo] = useState('');
-  const registerReducer = useSelector(({registerReducer}) => registerReducer);
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
-  const userReducer = useSelector(({userReducer}) => userReducer);
+  const registerReducer = useSelector(({ registerReducer }) => registerReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
+  const userReducer = useSelector(({ userReducer }) => userReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const [userIndex, setUserIndex] = useState(loginReducer.index);
   const dispatch = useDispatch();
   const [title, setTitle] = useState(Language.t('register.select'));
@@ -61,7 +67,9 @@ const RegisterScreen = () => {
     birthDate: moment().format('YYYYMMDD'),
     phoneNum: '',
     idCard: '',
+
   });
+
   const textInputChange = (val) => {
     if (val.length !== 0) {
       setData({
@@ -91,8 +99,19 @@ const RegisterScreen = () => {
   };
 
   const regisMacAdd = async () => {
-    console.log('REGIS MAC ADDRESS');
-    await fetch(userReducer.http + 'DevUsers', {
+    console.log('REGIS MAC ADDRESS' + databaseReducer.Data.urlser + '/DevUsers');
+    console.log(JSON.stringify({
+      'BPAPUS-BPAPSV': loginReducer.serviceID,
+      'BPAPUS-LOGIN-GUID': '',
+      'BPAPUS-FUNCTION': 'Register',
+      'BPAPUS-PARAM':
+        '{"BPAPUS-MACHINE":"' +
+        registerReducer.machineNum +
+        '","BPAPUS-CNTRY-CODE": "66","BPAPUS-MOBILE": "' +
+        newData.phoneNum +
+        '"}',
+    }))
+    await fetch(databaseReducer.Data.urlser + '/DevUsers', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -116,25 +135,37 @@ const RegisterScreen = () => {
       })
       .catch((error) => {
         console.log('ERROR at regisMacAdd ' + error);
-        console.log('http', userReducer.http);
-        if (userReducer.http == '') {
+        console.log('http', databaseReducer.Data.urlser);
+        if (databaseReducer.Data.urlser == '') {
           Alert.alert(
             Language.t('alert.errorTitle'),
-            Language.t('selectBase.error'),
-          );
+            Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         } else {
           Alert.alert(
             Language.t('alert.errorTitle'),
-            Language.t('alert.internetError'),
-          );
+            Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         }
+        setLoading(false)
       });
   };
 
   const _fetchGuidLogin = async () => {
     console.log('FETCH GUID LOGIN');
+    console.log(JSON.stringify({
+      'BPAPUS-BPAPSV': loginReducer.serviceID,
+      'BPAPUS-LOGIN-GUID': '',
+      'BPAPUS-FUNCTION': 'Login',
+      'BPAPUS-PARAM':
+        '{"BPAPUS-MACHINE": "' +
+        registerReducer.machineNum +
+        '","BPAPUS-USERID": "' +
+        loginReducer.userNameSer +
+        '","BPAPUS-PASSWORD": "' +
+        loginReducer.passwordSer +
+        '"}',
+    }))
     let GUID = '';
-    await fetch(userReducer.http + 'DevUsers', {
+    await fetch(databaseReducer.Data.urlser + '/DevUsers', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -158,15 +189,25 @@ const RegisterScreen = () => {
       })
       .catch((error) => {
         console.error('ERROR at _fetchGuidLogin' + error);
+        if (databaseReducer.Data.urlser == '') {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        } else {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        }
+        setLoading(false)
       });
     await fetchUserData(GUID);
   };
 
   const fetchUserData = async (GUID) => {
-    console.log('FETCH LookupErp');
+    console.log('FETCH /LookupErp');
     let xresult = '';
 
-    await fetch(userReducer.http + 'LookupErp', {
+    await fetch(databaseReducer.Data.urlser + '/LookupErp', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -189,21 +230,8 @@ const RegisterScreen = () => {
             responseData.Mb000130[i].MB_I_CARD == newData.idCard &&
             responseData.Mb000130[i].MB_PHONE == newData.phoneNum
           ) {
-            console.log('FETCH MbUsers');
-            console.log(
-              JSON.stringify({
-                'BPAPUS-BPAPSV': loginReducer.serviceID,
-                'BPAPUS-LOGIN-GUID': GUID,
-                'BPAPUS-FUNCTION': 'LoginByMobile',
-                'BPAPUS-PARAM':
-                  '{"MB_CNTRY_CODE": "66",    "MB_REG_MOBILE": "' +
-                  newData.phoneNum +
-                  '",    "MB_PW": "' +
-                  '1234' +
-                  '"}',
-              }),
-            );
-            await fetch(userReducer.http + 'MbUsers', {
+            console.log('FETCH /MbUsers');
+            await fetch(databaseReducer.Data.urlser + '/MbUsers', {
               method: 'POST',
               body: JSON.stringify({
                 'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -221,53 +249,31 @@ const RegisterScreen = () => {
               .then(async (json) => {
                 if (json.ResponseCode == '635') {
                   console.log('NOT FOUND MEMBER');
-                  Alert.alert(Language.t('login.errorNotfoundUsername'));
+                  Alert.alert('', Language.t('login.errorNotfoundUsername'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
                   //_fetchNewMember(GUID);
                 } else if (json.ResponseCode == '629') {
                   console.log('Function Parameter Required');
                 } else if (json.ResponseCode == '200') {
                   let responseData = JSON.parse(json.ResponseData);
                   let MB_LOGIN_GUID = responseData.MB_LOGIN_GUID;
-                  console.log('FETCH ShowMemberInfo');
-                  await fetch(userReducer.http + 'Member', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                      'BPAPUS-BPAPSV': Constants.SERVICE_ID,
-                      'BPAPUS-LOGIN-GUID': GUID,
-                      'BPAPUS-FUNCTION': 'ShowMemberInfo',
-                      'BPAPUS-PARAM':
-                        '{ "MB_LOGIN_GUID": "' + MB_LOGIN_GUID + '"}',
-                      'BPAPUS-FILTER': '',
-                      'BPAPUS-ORDERBY': '',
-                      'BPAPUS-OFFSET': '0',
-                      'BPAPUS-FETCH': '0',
-                    }),
-                  })
-                    .then((response) => response.json())
-                    .then((json) => {
-                      let responseData2 = JSON.parse(json.ResponseData);
-                      console.log('responseData2 ### ' + responseData2);
-                      if (json.ResponseCode == '200') {
-                        setResultJson(responseData2.ShowMemberInfo[0]);
-
-                        xresult = responseData2.ShowMemberInfo[0];
-                        console.log('xresult ==> ' + JSON.stringify(xresult));
-                        _onPressYes(responseData2.ShowMemberInfo[0]);
-                      }
-                      if (json.ResponseCode == '635') {
-                      } else {
-                        console.log(json.ReasonString);
-                      }
-                    })
-                    .catch((error) => {
-                      console.log('ERROR FETCH ShowMemberInfo: ' + error);
-                    });
+                  _onPressYes(MB_LOGIN_GUID, GUID);
                 } else {
                   console.log(json.ReasonString);
                 }
               })
-              .catch((error) =>
-                console.log('ERROR FETCH LoginByMobile : ' + error),
+              .catch((error) => {
+                if (databaseReducer.Data.urlser == '') {
+                  Alert.alert(
+                    Language.t('alert.errorTitle'),
+                    Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+                } else {
+                  Alert.alert(
+                    Language.t('alert.errorTitle'),
+                    Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+                } console.log('ERROR FETCH LoginByMobile : ' + error)
+                setLoading(false)
+              }
+
               );
             c = false;
             break;
@@ -276,7 +282,8 @@ const RegisterScreen = () => {
           }
         }
         if (c) {
-          Alert.alert(Language.t('login.errorNotfoundUsername'));
+          Alert.alert('', Language.t('login.errorNotfoundUsername'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+          setLoading(false)
         }
       });
   };
@@ -293,827 +300,394 @@ const RegisterScreen = () => {
   }, []);
 
   const checKPassword = () => {
+    setLoading(true)
     if (newData.password !== rePass) {
-      Alert.alert(Language.t('register.validationNotMatchPassword'));
+      Alert.alert('', Language.t('register.validationNotMatchPassword'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      setLoading(false)
     } else _setDispatch();
   };
-
   const _setDispatch = () => {
     let check = false;
-    if (newData.title == '-') {
-      Alert.alert(
-        Language.t('register.titleHeader'),
-        Language.t('profile.title'),
-      );
-      check = true;
-    } else {
-      dispatch(registerActions.nameTitle(newData.title));
-      let sex = '';
-      if (newData.title == 'นาย') {
-        sex = 'M';
-      } else if (newData.title == 'นาง' || newData.title == 'นางสาว') {
-        sex = 'F';
-      }
-      setNewData({...newData, sex: sex});
-    }
-    if (newData.firstName == '' && !check) {
-      Alert.alert(
-        Language.t('register.titleHeader'),
-        Language.t('profile.name'),
-      );
-      check = true;
-    } else {
-      dispatch(registerActions.firstName(newData.firstName));
-    }
-    if (newData.lastName == '' && !check) {
-      Alert.alert(
-        Language.t('register.titleHeader'),
-        Language.t('profile.name'),
-      );
-      check = true;
-    } else {
-      dispatch(registerActions.lastName(newData.lastName));
-    }
-    if (newData.birthDate == '') {
-      Alert.alert(
-        Language.t('register.titleHeader'),
-        Language.t('profile.birthday'),
-      );
-    } else {
-      dispatch(registerActions.birthDate(newData.birthDate));
-    }
+    setLoading(true)
     if (newData.idCard == '' && !check) {
       Alert.alert(
         Language.t('register.titleHeader'),
-        Language.t('register.validationEmptyIdCard'),
-      );
-      check = true;
+        Language.t('register.validationEmptyIdCard'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      check = true
     } else if (newData.idCard.length >= 1 && newData.idCard.length < 13) {
-      check = true;
-      Alert.alert(Language.t('register.validationIncorrectIdCard'));
+      check = true
+      Alert.alert(Language.t('register.validationIncorrectIdCard'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
     }
-
     if (newData.phoneNum == '' && !check) {
       Alert.alert(
         Language.t('register.titleHeader'),
-        Language.t('register.mobileNo'),
-      );
-      check = true;
-    } else {
-      dispatch(registerActions.phoneNum(newData.phoneNum));
+        Language.t('register.mobileNo'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      check = true
     }
-
     if (newData.password == '' && !check) {
       Alert.alert(
         Language.t('register.titleHeader'),
-        Language.t('register.password'),
-      );
-      check = true;
+        Language.t('register.password'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      check = true
     } else if (newData.password.length >= 1 && newData.password.length < 6) {
-      check = true;
-      Alert.alert(Language.t('register.validationLessPassword'));
-    } else {
-      dispatch(registerActions.password(newData.password));
+      check = true
+      Alert.alert('', Language.t('register.validationLessPassword'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
     }
     if (!check) {
-      regisMacAdd();
+      regisMacAdd()
+    } else {
+      setLoading(false)
     }
-  };
+  }
 
-  const _onPressYes = async (xresult) => {
-    console.log('ON PRESS YES');
+  const _onPressYes = async (MB_LOGIN_GUID, GUID) => {
     const navi = 'LoginScreen';
-    let temp = userReducer.userData;
-    let gender = '';
-    if (xresult.MB_SEX == '1') {
-      gender = 'M';
-    } else {
-      gender = 'F';
-    }
-    let newUser = {
-      title: xresult.MB_INTL,
-      firstName: xresult.MB_NAME,
-      lastName: xresult.MB_SURNME,
-      birthDate: xresult.MB_BIRTH,
-      ADDR_1: xresult.MB_ADDR_1,
-      sex: gender,
-      ADDR_2: xresult.MB_ADDR_2,
-      ADDR_3: xresult.MB_ADDR_3,
-      postCode: xresult.MB_POST,
-      phoneNum: xresult.MB_PHONE,
-      email: xresult.MB_EMAIL,
-      password: newData.password,
-      type: xresult.MT_NAME,
-      card: xresult.MB_CARD,
-      Ename: xresult.MB_E_NAME,
-      MB_SINCE: xresult.MB_SINCE,
-      MB_EXPIRE: xresult.MB_EXPIRE,
-      MB_RENEW: xresult.MB_RENEW,
-      SH_POINT: xresult.MB_SH_POINT,
-      CNTTPT: xresult.MB_CNTTPT,
-      interestImg: [],
-      userImg: '',
-      machineNo: registerReducer.machineNum,
-      loggedIn: false,
-      language: 'th',
-    };
-    //New user
-    if (temp.length == 0) {
-      temp.push(newUser);
-      dispatch(userActions.setUserData(temp));
-
-      //Alert.alert(Language.t('register.alertRegisterSuccess'));
-
-      navigation.navigate('AuthenticationScreen', {navi: navi});
-    } else {
-      for (let i in temp) {
-        /* old user*/
-        if (newUser.card == temp[i].card) {
-          temp[i] = newUser;
-          //Alert.alert(Language.t('register.alertRegisterSuccess'));
-          navigation.navigate('AuthenticationScreen', {navi: navi});
-          return;
-        }
-      }
-
-      temp.push(newUser);
-      dispatch(userActions.setUserData(temp));
-      //Alert.alert(Language.t('register.alertRegisterSuccess'));
-      navigation.navigate('AuthenticationScreen', {navi: navi});
-    }
-  };
+    const newnvi = { navi, MB_LOGIN_GUID, newData, GUID };
+    setLoading(false)
+    navigation.navigate('AuthenticationScreen', { navi: newnvi });
+  }
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fffff' }}>
       <Header
         style={{
           backgroundColor: Colors.backgroundColorSecondary,
           borderBottomColor: 'gray',
           borderBottomWidth: 0.7,
         }}>
+
         <Left>
           <Button transparent onPress={() => navigation.goBack()}>
             <Icons size={35} name="angle-left" />
           </Button>
         </Left>
         <Body>
-          <Title style={{color: 'black'}}>
+          <Title style={{ color: 'black' }}>
             {Language.t('register.header')}
           </Title>
         </Body>
         <Right />
       </Header>
-      <View style={styles.container1}>
-        {Platform.OS === 'ios' ? (
-          <KeyboardAvoidingView
-            behavior={'padding'}
-            keyboardVerticalOffset={100}
-            enabled>
-            <ScrollView>
-              <Text
-                style={{
-                  fontSize: FontSize.large,
-                  textDecorationLine: 'underline',
-                  fontWeight: 'bold',
-                  color: Colors.textColor,
-                }}>
-                {Language.t('register.titleHeader')}
-              </Text>
+      <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
+        <View style={{ backgroundColor: '#fffff' }} >
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignContent: 'space-between',
-                  marginTop: 10,
-                }}>
-                <Text style={styles.textTitle2}>
-                  {Language.t('profile.title')}
-                </Text>
-                {Platform.OS === 'ios' ? (
-                  <View
-                    style={{
-                      borderWidth: 0.7,
-                      borderColor: 'gray',
-                      marginLeft: 5,
-                      flex: 1,
-                    }}>
-                    <Picker
-                      headerBackButtonText={Language.t('button.back')}
-                      iosHeader={Language.t('profile.title')}
-                      mode="dropdown"
+          {Platform.OS === 'ios' ? (
+            <ScrollView >
+              <KeyboardAvoidingView
+                behavior={'padding'}
+                keyboardVerticalOffset={100}
+                enabled>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                  <View style={styles.container1} >
+                    <Text
                       style={{
-                        width: deviceWidth,
-                      }}
-                      placeholder={title}
-                      selectedValue={title}
-                      onValueChange={(item) => {
-                        let M = 'M';
-                        let F = 'F';
-                        if (item == 'นาย') {
-                          setNewData({...newData, sex: M});
-                        } else if (item == 'นาง' || item == 'นางสาว') {
-                          setNewData({...newData, sex: F});
-                        } else {
-                          setNewData({...newData, sex: '-'});
-                        }
-                        setNewData({...newData, title: item});
-                        setTitle(item);
+                        fontSize: FontSize.large,
+                        textDecorationLine: 'underline',
+                        fontWeight: 'bold',
+                        color: Colors.textColor,
                       }}>
-                      <Picker.Item
-                        label={Language.t('register.select')}
-                        value="-"
-                      />
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาย" value="นาย" />
-                      ) : (
-                        <Picker.Item label="Mr." value="นาย" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาง" value="นาง" />
-                      ) : (
-                        <Picker.Item label="Mrs" value="นาง" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นางสาว" value="นางสาว" />
-                      ) : (
-                        <Picker.Item label="Miss" value="นางสาว" />
-                      )}
-                    </Picker>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      borderWidth: 0.7,
-                      borderColor: 'gray',
-                      marginLeft: 5,
-                      flex: 1,
-                    }}>
-                    <Picker
-                      selectedValue={title}
-                      mode="dropdown"
-                      onValueChange={(item) => {
-                        let M = 'M';
-                        let F = 'F';
-                        if (item == 'นาย') {
-                          setNewData({...newData, sex: M});
-                        } else if (item == 'นาง' || item == 'นางสาว') {
-                          setNewData({...newData, sex: F});
-                        } else {
-                          setNewData({...newData, sex: '-'});
-                        }
-                        setNewData({...newData, title: item});
-                        setTitle(item);
-                      }}
-                      itemStyle={{
-                        width: 30,
-                      }}>
-                      <Picker.Item
-                        label={Language.t('register.select')}
-                        value="-"
-                      />
-
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาย" value="นาย" />
-                      ) : (
-                        <Picker.Item label="Mr." value="นาย" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาง" value="นาง" />
-                      ) : (
-                        <Picker.Item label="Mrs" value="นาง" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นางสาว" value="นางสาว" />
-                      ) : (
-                        <Picker.Item label="Miss" value="นางสาว" />
-                      )}
-                    </Picker>
-                  </View>
-                )}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('profile.firstName')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  keyboardType="default"
-                  maxLength={15}
-                  placeholder={Language.t('register.titleHeader')}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  onChangeText={(val) => {
-                    textInputChange(val);
-                    setNewData({...newData, firstName: val});
-                  }}
-                />
-                {data.check_textInputChange ? (
-                  <Icons name="check-circle" size={25} color="#0288D1" />
-                ) : null}
-              </View>
-
-              <Text style={styles.textTitle}>
-                {Language.t('profile.lastName')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  maxLength={13}
-                  placeholder={Language.t('register.titleHeader')}
-                  onChangeText={(val) => {
-                    setNewData({...newData, lastName: val});
-
-                    if (val === '') {
-                      setdata2(false);
-                    } else {
-                      setdata2(true);
-                    }
-                  }}
-                />
-                {data2 ? (
-                  <Icons name="check-circle" size={25} color="#0288D1" />
-                ) : null}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('profile.birthday')}
-              </Text>
-              <DatePicker
-                date={date}
-                onChange={(date) => {
-                  if (date) {
-                    let arr = moment(date).format('L').split('/');
-                    console.log(arr[2].concat(arr[1]).concat(arr[0]));
-                    setDate(arr[2].concat(arr[1]).concat(arr[0]));
-                    setNewData({
-                      ...newData,
-                      birthDate: arr[2].concat(arr[1]).concat(arr[0]),
-                    });
-                  }
-                }}
-              />
-
-              <Text style={styles.textTitle}>
-                {Language.t('register.mobileNo')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  keyboardType="number-pad"
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  maxLength={10}
-                  dataDetectorTypes="phoneNumber"
-                  placeholder={Language.t(
-                    'register.validationEmptyPhoneNumber',
-                  )}
-                  onChangeText={(val) => {
-                    setNewData({...newData, phoneNum: val});
-                    setdata3(true);
-                    if (val === '') {
-                      setdata3(false);
-                    }
-                  }}
-                />
-                {data3 ? (
-                  <Icons
-                    name="check-circle"
-                    size={25}
-                    color={Colors.buttonColorPrimary}></Icons>
-                ) : null}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('register.idCard')}
-              </Text>
-              <TextInput
-                placeholderTextColor={Colors.fontColorSecondary}
-                maxLength={13}
-                placeholder={Language.t('register.validationEmptyIdCard')}
-                onChangeText={(val) => {
-                  setNewData({...newData, idCard: val});
-                }}
-                style={styles.textInput}></TextInput>
-
-              <Text style={styles.textTitle}>
-                {Language.t('register.password')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  secureTextEntry={data.secureTextEntry ? true : false}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  maxLength={8}
-                  placeholder={Language.t('register.validationEmptyPassword')}
-                  autoCapitalize="none"
-                  onChangeText={(val) => {
-                    handlePasswordChange(val);
-                    setNewData({...newData, password: val});
-                  }}
-                />
-                <TouchableOpacity onPress={updateSecureTextEntry}>
-                  {data.secureTextEntry ? (
-                    <Icons
-                      name="eye-slash"
-                      size={25}
-                      color={Colors.buttonColorPrimary}
-                    />
-                  ) : (
-                    <Icons
-                      name="eye"
-                      size={25}
-                      color={Colors.buttonColorPrimary}></Icons>
-                  )}
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('register.confirmPassword')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  secureTextEntry={data.secureTextEntry ? true : false}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  autoCapitalize="none"
-                  onChangeText={(val) => {
-                    handlePasswordChange(val);
-                    setRePass(val);
-                  }}
-                  maxLength={8}
-                  placeholder={Language.t(
-                    'register.validationEmptyConfirmPassword',
-                  )}
-                />
-              </View>
-
-              <View
-                style={{
-                  marginTop: 10,
-                  marginBottom: 20,
-                  justifyContent: 'flex-end',
-                  flexDirection: 'column',
-                }}>
-                <TouchableNativeFeedback onPress={checKPassword}>
-                  <View style={styles.button}>
-                    <Text style={styles.textButton}>
-                      {Language.t('register.buttonRegister')}
+                      {Language.t('register.titleHeader')}
                     </Text>
+
+                    <Text style={styles.textTitle}>
+                      {Language.t('register.mobileNo')}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        padding: 2,
+                        alignItems: 'center',
+                      }}>
+                      <TextInput
+                        style={styles.textInput}
+                        keyboardType="number-pad"
+                        placeholderTextColor={Colors.fontColorSecondary}
+                        maxLength={10}
+                        dataDetectorTypes="phoneNumber"
+                        placeholder={Language.t(
+                          'register.validationEmptyPhoneNumber',
+                        )}
+                        onChangeText={(val) => {
+                          setNewData({ ...newData, phoneNum: val });
+                          setdata3(true);
+                          if (val === '') {
+                            setdata3(false);
+                          }
+                        }}
+                      />
+                      {data3 ? (
+                        <Icons
+                          name="check-circle"
+                          size={25}
+                          color={Colors.buttonColorPrimary}></Icons>
+                      ) : null}
+                    </View>
+                    <Text style={styles.textTitle}>
+                      {Language.t('register.idCard')}
+                    </Text>
+                    <TextInput
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      maxLength={13}
+                      keyboardType="number-pad"
+                      placeholder={Language.t('register.validationEmptyIdCard')}
+                      onChangeText={(val) => {
+                        setNewData({ ...newData, idCard: val });
+                      }}
+                      style={styles.textInput}></TextInput>
+
+                    <Text style={styles.textTitle}>
+                      {Language.t('register.password')}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        padding: 2,
+                        alignItems: 'center',
+                      }}>
+                      <TextInput
+                        style={styles.textInput}
+                        secureTextEntry={data.secureTextEntry ? true : false}
+                        placeholderTextColor={Colors.fontColorSecondary}
+                        keyboardType="default"
+                        maxLength={8}
+                        placeholder={Language.t('register.validationEmptyPassword')}
+                        autoCapitalize="none"
+                        onChangeText={(val) => {
+                          handlePasswordChange(val);
+                          setNewData({ ...newData, password: val });
+                        }}
+                      />
+                      <TouchableOpacity onPress={updateSecureTextEntry}>
+                        {data.secureTextEntry ? (
+                          <Icons
+                            name="eye-slash"
+                            size={25}
+                            color={Colors.buttonColorPrimary}
+                          />
+                        ) : (
+                          <Icons
+                            name="eye"
+                            size={25}
+                            color={Colors.buttonColorPrimary}></Icons>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.textTitle}>
+                      {Language.t('register.confirmPassword')}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        padding: 2,
+                        alignItems: 'center',
+                      }}>
+                      <TextInput
+                        style={styles.textInput}
+                        secureTextEntry={data.secureTextEntry ? true : false}
+                        placeholderTextColor={Colors.fontColorSecondary}
+                        keyboardType="default"
+                        autoCapitalize="none"
+                        onChangeText={(val) => {
+                          handlePasswordChange(val);
+                          setRePass(val);
+                        }}
+                        maxLength={8}
+                        placeholder={Language.t(
+                          'register.validationEmptyConfirmPassword',
+                        )}
+                      />
+                    </View>
+
+                    <View
+                      style={{
+                        marginTop: 10,
+
+                        justifyContent: 'flex-end',
+                        flexDirection: 'column',
+                      }}>
+                      <TouchableNativeFeedback onPress={checKPassword}>
+                        <View style={styles.button}>
+                          <Text style={styles.textButton}>
+                            {Language.t('register.buttonRegister')}
+                          </Text>
+                        </View>
+                      </TouchableNativeFeedback>
+                    </View>
                   </View>
-                </TouchableNativeFeedback>
-              </View>
+                </TouchableWithoutFeedback>
+              </KeyboardAvoidingView>
             </ScrollView>
-          </KeyboardAvoidingView>
-        ) : (
-          <ScrollView enabled={true}>
-            <KeyboardAvoidingView
-              behavior={'padding'}
-              enabled
-              keyboardVerticalOffset={-170}>
-              <Text
-                style={{
-                  fontSize: FontSize.large,
-                  textDecorationLine: 'underline',
-                  fontWeight: 'bold',
-                  color: Colors.textColor,
-                }}>
-                {Language.t('register.titleHeader')}
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignContent: 'space-between',
-                  marginTop: 10,
-                }}>
-                <Text style={styles.textTitle2}>
-                  {Language.t('profile.title')}
-                </Text>
-                {Platform.OS === 'ios' ? (
+          ) : (
+            <ScrollView    >
+              <View style={styles.container1} >
+                <KeyboardAvoidingView
+                  behavior={'padding'}
+                  enabled
+                  keyboardVerticalOffset={-170}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.large,
+                      textDecorationLine: 'underline',
+                      fontWeight: 'bold',
+                      color: Colors.textColor,
+                    }}>
+                    {Language.t('register.titleHeader')}
+                  </Text>
+                  <Text style={styles.textTitle}>
+                    {Language.t('register.mobileNo')}
+                  </Text>
                   <View
                     style={{
-                      borderWidth: 0.7,
-                      borderColor: 'gray',
-                      marginLeft: 5,
-                      flex: 1,
+                      flexDirection: 'row',
+                      padding: 2,
+                      alignItems: 'center',
                     }}>
-                    <Picker
-                      headerBackButtonText={Language.t('button.back')}
-                      iosHeader={Language.t('profile.title')}
-                      mode="dropdown"
-                      style={{
-                        width: deviceWidth,
-                      }}
-                      placeholder={title}
-                      selectedValue={title}
-                      onValueChange={(item) => {
-                        let M = 'M';
-                        let F = 'F';
-                        if (item == 'นาย') {
-                          setNewData({...newData, sex: M});
-                        } else if (item == 'นาง' || item == 'นางสาว') {
-                          setNewData({...newData, sex: F});
-                        } else {
-                          setNewData({...newData, sex: '-'});
+                    <TextInput
+                      style={styles.textInput}
+                      keyboardType="number-pad"
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      maxLength={10}
+                      dataDetectorTypes="phoneNumber"
+                      placeholder={Language.t(
+                        'register.validationEmptyPhoneNumber',
+                      )}
+                      onChangeText={(val) => {
+                        setNewData({ ...newData, phoneNum: val });
+                        setdata3(true);
+                        if (val === '') {
+                          setdata3(false);
                         }
-                        setNewData({...newData, title: item});
-                        setTitle(item);
-                      }}>
-                      <Picker.Item
-                        label={Language.t('register.select')}
-                        value="-"
-                      />
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาย" value="นาย" />
-                      ) : (
-                        <Picker.Item label="Mr." value="นาย" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาง" value="นาง" />
-                      ) : (
-                        <Picker.Item label="Mrs" value="นาง" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นางสาว" value="นางสาว" />
-                      ) : (
-                        <Picker.Item label="Miss" value="นางสาว" />
-                      )}
-                    </Picker>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      borderWidth: 0.7,
-                      borderColor: 'gray',
-                      marginLeft: 5,
-                      flex: 1,
-                    }}>
-                    <Picker
-                      selectedValue={title}
-                      mode="dropdown"
-                      onValueChange={(item) => {
-                        let M = 'M';
-                        let F = 'F';
-                        if (item == 'นาย') {
-                          setNewData({...newData, sex: M});
-                        } else if (item == 'นาง' || item == 'นางสาว') {
-                          setNewData({...newData, sex: F});
-                        } else {
-                          setNewData({...newData, sex: '-'});
-                        }
-                        setNewData({...newData, title: item});
-                        setTitle(item);
                       }}
-                      itemStyle={{
-                        width: 30,
-                      }}>
-                      <Picker.Item
-                        label={Language.t('register.select')}
-                        value="-"
-                      />
-
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาย" value="นาย" />
-                      ) : (
-                        <Picker.Item label="Mr." value="นาย" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นาง" value="นาง" />
-                      ) : (
-                        <Picker.Item label="Mrs" value="นาง" />
-                      )}
-                      {Language.getLang() === 'th' ? (
-                        <Picker.Item label="นางสาว" value="นางสาว" />
-                      ) : (
-                        <Picker.Item label="Miss" value="นางสาว" />
-                      )}
-                    </Picker>
-                  </View>
-                )}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('profile.firstName')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  keyboardType="default"
-                  maxLength={15}
-                  placeholder={Language.t('register.titleHeader')}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  onChangeText={(val) => {
-                    textInputChange(val);
-                    setNewData({...newData, firstName: val});
-                  }}
-                />
-                {data.check_textInputChange ? (
-                  <Icons name="check-circle" size={25} color="#0288D1" />
-                ) : null}
-              </View>
-
-              <Text style={styles.textTitle}>
-                {Language.t('profile.lastName')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  maxLength={13}
-                  placeholder={Language.t('register.titleHeader')}
-                  onChangeText={(val) => {
-                    setNewData({...newData, lastName: val});
-
-                    if (val === '') {
-                      setdata2(false);
-                    } else {
-                      setdata2(true);
-                    }
-                  }}
-                />
-                {data2 ? (
-                  <Icons name="check-circle" size={25} color="#0288D1" />
-                ) : null}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('profile.birthday')}
-              </Text>
-              <DatePicker
-                date={date}
-                onChange={(date) => {
-                  if (date) {
-                    let arr = moment(date).format('L').split('/');
-                    console.log(arr[2].concat(arr[1]).concat(arr[0]));
-                    setDate(arr[2].concat(arr[1]).concat(arr[0]));
-                    setNewData({
-                      ...newData,
-                      birthDate: arr[2].concat(arr[1]).concat(arr[0]),
-                    });
-                  }
-                }}
-              />
-
-              <Text style={styles.textTitle}>
-                {Language.t('register.mobileNo')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  keyboardType="number-pad"
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  maxLength={10}
-                  dataDetectorTypes="phoneNumber"
-                  placeholder={Language.t(
-                    'register.validationEmptyPhoneNumber',
-                  )}
-                  onChangeText={(val) => {
-                    setNewData({...newData, phoneNum: val});
-                    setdata3(true);
-                    if (val === '') {
-                      setdata3(false);
-                    }
-                  }}
-                />
-                {data3 ? (
-                  <Icons
-                    name="check-circle"
-                    size={25}
-                    color={Colors.buttonColorPrimary}></Icons>
-                ) : null}
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('register.idCard')}
-              </Text>
-              <TextInput
-                placeholderTextColor={Colors.fontColorSecondary}
-                maxLength={13}
-                placeholder={Language.t('register.validationEmptyIdCard')}
-                onChangeText={(val) => {
-                  setNewData({...newData, idCard: val});
-                }}
-                style={styles.textInput}></TextInput>
-
-              <Text style={styles.textTitle}>
-                {Language.t('register.password')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  secureTextEntry={data.secureTextEntry ? true : false}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  maxLength={8}
-                  placeholder={Language.t('register.validationEmptyPassword')}
-                  autoCapitalize="none"
-                  onChangeText={(val) => {
-                    handlePasswordChange(val);
-                    setNewData({...newData, password: val});
-                  }}
-                />
-                <TouchableOpacity onPress={updateSecureTextEntry}>
-                  {data.secureTextEntry ? (
-                    <Icons
-                      name="eye-slash"
-                      size={25}
-                      color={Colors.buttonColorPrimary}
                     />
-                  ) : (
-                    <Icons
-                      name="eye"
-                      size={25}
-                      color={Colors.buttonColorPrimary}></Icons>
-                  )}
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.textTitle}>
-                {Language.t('register.confirmPassword')}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  padding: 2,
-                  alignItems: 'center',
-                }}>
-                <TextInput
-                  style={styles.textInput}
-                  secureTextEntry={data.secureTextEntry ? true : false}
-                  placeholderTextColor={Colors.fontColorSecondary}
-                  keyboardType="default"
-                  autoCapitalize="none"
-                  onChangeText={(val) => {
-                    handlePasswordChange(val);
-                    setRePass(val);
-                  }}
-                  maxLength={8}
-                  placeholder={Language.t(
-                    'register.validationEmptyConfirmPassword',
-                  )}
-                />
-              </View>
-
-              <View
-                style={{
-                  marginTop: 10,
-                  marginBottom: 20,
-                  justifyContent: 'flex-end',
-                  flexDirection: 'column',
-                }}>
-                <TouchableNativeFeedback onPress={checKPassword}>
-                  <View style={styles.button}>
-                    <Text style={styles.textButton}>
-                      {Language.t('register.buttonRegister')}
-                    </Text>
+                    {data3 ? (
+                      <Icons
+                        name="check-circle"
+                        size={25}
+                        color={Colors.buttonColorPrimary}></Icons>
+                    ) : null}
                   </View>
-                </TouchableNativeFeedback>
+                  <Text style={styles.textTitle}>
+                    {Language.t('register.idCard')}
+                  </Text>
+                  <TextInput
+                    placeholderTextColor={Colors.fontColorSecondary}
+                    maxLength={13}
+                    keyboardType="number-pad"
+                    placeholder={Language.t('register.validationEmptyIdCard')}
+                    onChangeText={(val) => {
+                      setNewData({ ...newData, idCard: val });
+                    }}
+                    style={styles.textInput}></TextInput>
+
+                  <Text style={styles.textTitle}>
+                    {Language.t('register.password')}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      padding: 2,
+                      alignItems: 'center',
+                    }}>
+                    <TextInput
+                      style={styles.textInput}
+                      secureTextEntry={data.secureTextEntry ? true : false}
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      keyboardType="default"
+                      maxLength={8}
+                      placeholder={Language.t('register.validationEmptyPassword')}
+                      autoCapitalize="none"
+                      onChangeText={(val) => {
+                        handlePasswordChange(val);
+                        setNewData({ ...newData, password: val });
+                      }}
+                    />
+
+                    <TouchableOpacity onPress={updateSecureTextEntry}>
+                      {data.secureTextEntry ? (
+                        <Icons
+                          name="eye-slash"
+                          size={25}
+                          color={Colors.buttonColorPrimary}
+                        />
+                      ) : (
+                        <Icons
+                          name="eye"
+                          size={25}
+                          color={Colors.buttonColorPrimary}></Icons>
+                      )}
+
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.textTitle}>
+                    {Language.t('register.confirmPassword')}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      padding: 2,
+                      alignItems: 'center',
+                    }}>
+                    <TextInput
+                      style={styles.textInput}
+                      secureTextEntry={data.secureTextEntry ? true : false}
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      keyboardType="default"
+                      autoCapitalize="none"
+                      onChangeText={(val) => {
+                        handlePasswordChange(val);
+                        setRePass(val);
+                      }}
+                      maxLength={8}
+                      placeholder={Language.t(
+                        'register.validationEmptyConfirmPassword',
+                      )}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      marginTop: 10,
+                      justifyContent: 'flex-end',
+                      flexDirection: 'column',
+                    }}>
+                    <TouchableNativeFeedback onPress={checKPassword}>
+                      <View style={styles.button}>
+                        <Text style={styles.textButton}>
+                          {Language.t('register.buttonRegister')}
+                        </Text>
+                      </View>
+                    </TouchableNativeFeedback>
+                  </View>
+                </KeyboardAvoidingView>
               </View>
-            </KeyboardAvoidingView>
-          </ScrollView>
-        )}
-      </View>
+            </ScrollView>)}
+        </View>
+      </KeyboardAvoidingView>
+      {loading && (
+        <View
+          style={{
+            width: deviceWidth,
+            height: deviceHeight,
+            opacity: 0.5,
+            backgroundColor: 'gray',
+            alignSelf: 'center',
+            justifyContent: 'center',
+            alignContent: 'center',
+            position: 'absolute',
+          }}>
+          <ActivityIndicator
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+
+              backgroundColor: null
+            }}
+            animating={loading}
+            size="large"
+            color="white"
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -1121,13 +695,15 @@ const styles = StyleSheet.create({
   container1: {
     backgroundColor: Colors.backgroundColorSecondary,
     paddingHorizontal: Platform.OS === 'ios' ? 10 : 20,
+    paddingBottom: 0,
     flex: 1,
     flexDirection: 'column',
+
   },
   button: {
     marginTop: 10,
-    marginBottom: 25,
     padding: 5,
+    marginBottom: 20,
     alignItems: 'center',
     backgroundColor: Colors.buttonColorPrimary,
     borderRadius: 10,
@@ -1162,39 +738,39 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state) => {
   return {
-    title: state.registerReducer.title,
-    firstName: state.registerReducer.firstName,
-    lastName: state.registerReducer.lastName,
-    birthDate: state.registerReducer.birthDate,
-    phoneNum: state.registerReducer.phoneNum,
-    password: state.registerReducer.password,
-    machineNum: state.loginReducer.machineNo,
-    userData: state.userReducer.userData,
-    sex: state.registerReducer.sex,
-    ADDR_1: state.registerReducer.ADDR_1,
-    ADDR_2: state.registerReducer.ADDR_2,
-    ADDR_3: state.registerReducer.ADDR_3,
-    postcode: state.registerReducer.postcode,
-    email: state.registerReducer.email,
+    // title: state.registerReducer.title,
+    // firstName: state.registerReducer.firstName,
+    // lastName: state.registerReducer.lastName,
+    // birthDate: state.registerReducer.birthDate,
+    // phoneNum: state.registerReducer.phoneNum,
+    // password: state.registerReducer.password,
+    // machineNum: state.loginReducer.machineNo,
+    // userData: state.userReducer.userData,
+    // sex: state.registerReducer.sex,
+    // ADDR_1: state.registerReducer.ADDR_1,
+    // ADDR_2: state.registerReducer.ADDR_2,
+    // ADDR_3: state.registerReducer.ADDR_3,
+    // postcode: state.registerReducer.postcode,
+    // email: state.registerReducer.email,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    reduxTitle: (payload) => dispatch(nameTitle(payload)),
-    reduxFirstName: (payload) => dispatch(firstName(payload)),
-    reduxLastName: (payload) => dispatch(lastName(payload)),
-    reduxBirthDate: (payload) => dispatch(birthDate(payload)),
-    reduxMachineNum: (payload) => dispatch(machine(payload)),
-    reduxPhoneNum: (payload) => dispatch(phoneNum(payload)),
-    reduxPassword: (payload) => dispatch(password(payload)),
-    reduxSex: (payload) => dispatch(sex(payload)),
-    reduxADDR_1: (payload) => dispatch(ADDR_1(payload)),
-    reduxADDR_2: (payload) => dispatch(ADDR_2(payload)),
-    reduxADDR_3: (payload) => dispatch(ADDR_3(payload)),
-    reduxPostcode: (payload) => dispatch(postcode(payload)),
-    reduxEmail: (payload) => dispatch(email(payload)),
-    reduxSetUserData: (payload) => dispatch(setUserData(payload)),
+    // reduxTitle: (payload) => dispatch(nameTitle(payload)),
+    // reduxFirstName: (payload) => dispatch(firstName(payload)),
+    // reduxLastName: (payload) => dispatch(lastName(payload)),
+    // reduxBirthDate: (payload) => dispatch(birthDate(payload)),
+    // reduxMachineNum: (payload) => dispatch(machine(payload)),
+    // reduxPhoneNum: (payload) => dispatch(phoneNum(payload)),
+    // reduxPassword: (payload) => dispatch(password(payload)),
+    // reduxSex: (payload) => dispatch(sex(payload)),
+    // reduxADDR_1: (payload) => dispatch(ADDR_1(payload)),
+    // reduxADDR_2: (payload) => dispatch(ADDR_2(payload)),
+    // reduxADDR_3: (payload) => dispatch(ADDR_3(payload)),
+    // reduxPostcode: (payload) => dispatch(postcode(payload)),
+    // reduxEmail: (payload) => dispatch(email(payload)),
+    // reduxSetUserData: (payload) => dispatch(setUserData(payload)),
   };
 };
 

@@ -17,12 +17,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {ScrollView} from 'react-native-gesture-handler';
 import RNFetchBlob from 'rn-fetch-blob';
 const InstructionScreen = () => {
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const loginReducer = useSelector(({loginReducer}) => loginReducer);
   const userReducer = useSelector(({userReducer}) => userReducer);
   const [bannerImg, setBannerImg] = useState('');
   const [text, setText] = useState('');
   const fetchData = async () => {
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,

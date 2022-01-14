@@ -9,7 +9,7 @@ const initialState = {
   LOname: [],
   LOresult: [],
   pageResult: [],
-};
+}
 
 const contactUsReducer = (state = initialState, {type, payload}) => {
   switch (type) {
@@ -25,5 +25,6 @@ const contactUsReducer = (state = initialState, {type, payload}) => {
     default:
       return state;
   }
-};
+}
+
 export default contactUsReducer;

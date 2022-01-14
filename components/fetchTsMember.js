@@ -7,7 +7,7 @@ import * as Constants from '../src/Constants';
 export const fetchTsMember = async (http, phoneNum, password, GUIDResult) => {
   let xresult = '';
 
-  await fetch(http + 'MbUsers', {
+  await fetch(http + '/MbUsers', {
     method: 'POST',
     body: JSON.stringify({
       'BPAPUS-BPAPSV': Constants.SERVICE_ID,
@@ -34,7 +34,7 @@ export const fetchTsMember = async (http, phoneNum, password, GUIDResult) => {
       } else if (json && json.ResponseCode == '200') {
         let responseData = JSON.parse(json.ResponseData);
         let MB_LOGIN_GUID = responseData.MB_LOGIN_GUID;
-        await fetch(http + 'Member', {
+        await fetch(http + '/Member', {
           method: 'POST',
           body: JSON.stringify({
             'BPAPUS-BPAPSV': Constants.SERVICE_ID,

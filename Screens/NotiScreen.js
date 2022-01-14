@@ -38,6 +38,7 @@ const NotiScreen = () => {
   const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const [arrayObj, setArrayObj] = useState([]);
   const userReducer = useSelector(({ userReducer }) => userReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const [selectedId, setSelectedId] = useState(null);
   const dispatch = useDispatch();
   const deviceWidth = Dimensions.get('window').width;
@@ -74,7 +75,7 @@ const NotiScreen = () => {
   const fetchData = async () => {
     var arrayName = [];
     var arrayGuid = [];
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -110,7 +111,7 @@ const NotiScreen = () => {
   const fetchPage = async (ra) => {
     let redeemGuid = [];
     for (let i in ra) {
-      await fetch(userReducer.http + 'ECommerce', {
+      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,

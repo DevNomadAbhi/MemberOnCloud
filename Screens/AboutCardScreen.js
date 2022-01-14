@@ -8,11 +8,12 @@ import { FontSize } from '../components/FontSizeHelper';
 const AboutCardScreen = () => {
   const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const userReducer = useSelector(({ userReducer }) => userReducer);
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const [userIndex, setUserIndex] = useState(loginReducer.index);
   const [resultJson, setResultJson] = useState([]);
 
   const fetchData = async () => {
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,

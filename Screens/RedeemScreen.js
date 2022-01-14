@@ -20,6 +20,7 @@ const deviceHeight = Dimensions.get('window').height;
 import {FontSize} from '../components/FontSizeHelper';
 
 const RedeemTabStack = () => {
+  const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
   const loginReducer = useSelector(({loginReducer}) => loginReducer);
   const userReducer = useSelector(({userReducer}) => userReducer);
   const redeemReducer = useSelector(({redeemReducer}) => redeemReducer);
@@ -29,7 +30,7 @@ const RedeemTabStack = () => {
   const fetchData = async () => {
     var arrayGuid = [];
 
-    await fetch(userReducer.http + 'ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -66,7 +67,7 @@ const RedeemTabStack = () => {
     let redeemGuid = [];
     var arrayName = [];
     for (let i in ra) {
-      await fetch(userReducer.http + 'ECommerce', {
+      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,

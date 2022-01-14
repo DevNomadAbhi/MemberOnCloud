@@ -17,12 +17,14 @@ import {
 import {FontSize} from '../components/FontSizeHelper';
 import {Language} from '../translations/I18n';
 
+
 const HelperScreen = () => {
+  
   const dataArray = [
     {
       title:
         'โปรแกรม App Bplus Member สามารถติดตั้งบนระบบ Android และ IOS เวอร์ชั่นอะไรได้บ้าง',
-
+  
       content:
         '   สามารถติดตั้งบน Android เวอร์ชั่น 6 ขึ้นไป และ IOS เวอร์ชั่น 10 ขึ้นไป',
     },
@@ -57,7 +59,7 @@ const HelperScreen = () => {
         '\n' +
         '4. Log in เข้าใช้งานตามเบอร์โทร และรหัส Password ที่ได้ Register',
     },
-
+  
     {
       title: 'มีการแก้ไขข้อมูลส่วนตัวของสมาชิก แล้วข้อมูลไม่ได้ปรับให้ทันที',
       content:
@@ -90,7 +92,6 @@ const HelperScreen = () => {
         'แคมเปญที่แสดงจะเป็นแคมเปญที่จัดรายการอยู่ในช่วงนั้น สามารถไปใช้สิทธิ์ได้',
     },
   ];
-
   const _renderHeader = (item, expanded) => {
     return (
       <SafeAreaView>
@@ -116,7 +117,7 @@ const HelperScreen = () => {
       </SafeAreaView>
     );
   };
-
+  
   const _renderContent = (item) => {
     return (
       <Text
@@ -128,7 +129,6 @@ const HelperScreen = () => {
       </Text>
     );
   };
-
   return (
     <SafeAreaView style={{flex: 1}}>
       <Header

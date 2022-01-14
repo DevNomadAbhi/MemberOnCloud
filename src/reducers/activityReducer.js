@@ -6,7 +6,8 @@ import {
   ACTION_ACT_GETPAGE_RESULT,
   ACTION_ACT_GETCON_NAME,
   ACTION_ACT_GETCON_RESULT,
-} from '../Constants';
+  ACTION_ACT_GETCON_LASTUPDATE,
+} from '../Constants'
 const initialState = {
     LOguid: [],
     LOname: [],
@@ -15,8 +16,8 @@ const initialState = {
     pageResult: [],
     conName: true,
     conResult: '',
-  
-  };
+    lastupdate:''
+  }
   
   const activityReducer = (state = initialState, {type, payload}) => {
     switch (type) {
@@ -34,7 +35,8 @@ const initialState = {
         return {...state, conName: payload};
       case ACTION_ACT_GETCON_RESULT:
         return {...state, conResult: payload};
-  
+        case ACTION_ACT_GETCON_LASTUPDATE:
+          return {...state, lastupdate: payload};
       default:
         return state;
     }

@@ -6,6 +6,7 @@ import {
   ACTION_ACT_GETPAGE_RESULT,
   ACTION_ACT_GETCON_NAME,
   ACTION_ACT_GETCON_RESULT,
+  ACTION_ACT_GETCON_LASTUPDATE,
 } from '../Constants';
 export const LOguid = (payload) => ({
   type: ACTION_ACT_GETLO_GUID,
@@ -35,3 +36,8 @@ export const ConResult = (payload) => ({
   type: ACTION_ACT_GETCON_RESULT,
   payload,
 });
+export const lastupdate = (payload) => ({
+  type: ACTION_ACT_GETCON_LASTUPDATE,
+  payload,
+});
+
