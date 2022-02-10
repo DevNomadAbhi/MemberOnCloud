@@ -61,8 +61,8 @@ const SelectBase = ({ route }) => {
   const [selectlanguage, setlanguage] = useState(Language.getLang() == 'th' ? 'th' : 'en');
   const [basename, setBasename] = useState('');
   const [baseurl, setBsaeurl] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('BUSINESS');
+  const [password, setPassword] = useState('SYSTEM');
   const [isShowDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useStateIfMounted(false);
   const [loading_backG, setLoading_backG] = useStateIfMounted(true);
@@ -77,8 +77,7 @@ const SelectBase = ({ route }) => {
   const image = '../images/UI/endpoint/4x/Asset12_4x.png';
   const setlanguageState = (itemValue) => {
     dispatch(loginActions.setLanguage(itemValue))
-    console.log(itemValue)
-  }
+   }
   var a = 0
 
   const updateSecureTextEntry = () => {
@@ -130,8 +129,7 @@ const SelectBase = ({ route }) => {
     } else {
       setBasename('')
       setBsaeurl('')
-      setUsername('')
-      setPassword('')
+      
     }
   }
 
@@ -225,7 +223,7 @@ const SelectBase = ({ route }) => {
 
       }
     }
-    setLoading(false)
+    
   }
 
   const _onPressAddbase = async () => {
@@ -274,16 +272,14 @@ const SelectBase = ({ route }) => {
         }
         if (!check) {
           checkIPAddress('1')
-        } else {
-          setLoading(false)
-        }
+        }  
       } else {
         Alert.alert(
           Language.t('alert.errorTitle'),
           Language.t('selectBase.Alert3'), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
         setLoading(false)
       }
-      setLoading(false)
+      
     } else {
       Alert.alert(
         Language.t('alert.errorTitle'),
@@ -392,7 +388,7 @@ const SelectBase = ({ route }) => {
             Language.t('alert.errorTitle'),
             Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         }
-        setLoading(false)
+       
       })
       .catch((error) => {
         Alert.alert(
@@ -596,7 +592,7 @@ const SelectBase = ({ route }) => {
                   </View>
                 </View>
               </View>
-              <View style={{ marginTop: 10 }}>
+              {/* <View style={{ marginTop: 10 }}>
                 <Text style={styles.textTitle}>
                   {Language.t('login.username')} :
                 </Text>
@@ -701,7 +697,7 @@ const SelectBase = ({ route }) => {
                     </TouchableOpacity>
                   </View>
                 </View>
-              </View>
+              </View> */}
 
 
               <View style={styles.body1e}>
@@ -822,7 +818,7 @@ const SelectBase = ({ route }) => {
 
 const styles = StyleSheet.create({
   container1: {
-    backgroundColor: '#C8FFFF',
+    backgroundColor: '#E8FFFF',
     flex: 1,
 
   },

@@ -113,9 +113,13 @@ const LoginScreen = () => {
     console.log(`userloggedIn >> ${loginReducer.userloggedIn}`)
     console.log(`userName >> ${loginReducer.userName}`)
     console.log(`password >> ${loginReducer.password}`)
-    if (loginReducer.userloggedIn == true) {
+    if (loginReducer.userloggedIn == true && tempUser[userIndex].interestImg.length > 0) {
       await _onPressLogin(loginReducer.userName, loginReducer.password)
     } else {
+      dispatch(loginActions.userName(''));
+      dispatch(loginActions.password(''));
+      setuLogin(false);
+      dispatch(loginActions.userlogin(false));
       closeLoading()
     }
   }
@@ -290,7 +294,7 @@ const LoginScreen = () => {
                   Alert.alert(
                     Language.t('alert.errorTitle'),
                     Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                } 
+                }
                 console.log('ERROR FETCH LoginByMobile : ' + error)
                 setLoading(false)
               }
@@ -374,21 +378,28 @@ const LoginScreen = () => {
             temp.push(newUser);
             dispatch(userActions.setUserData(temp));
             Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-            navigation.navigate(navi.navi);
+            navigation.dispatch(
+              navigation.replace(navi.navi)
+            )
+
           } else {
             for (let i in temp) {
               /* old user*/
               if (newUser.card == temp[i].card) {
                 temp[i] = newUser;
                 Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                navigation.navigate(navi.navi);
+                navigation.dispatch(
+                  navigation.replace(navi.navi)
+                )
                 return;
               }
             }
             temp.push(newUser);
             dispatch(userActions.setUserData(temp));
             Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-            navigation.navigate(navi.navi);
+            navigation.dispatch(
+              navigation.replace(navi.navi)
+            )
           }
         }
         if (json.ResponseCode == '635') {
@@ -570,17 +581,12 @@ const LoginScreen = () => {
         closeLoading();
         if (c == true) {
           dispatch(loginActions.userlogin(true));
-          if (tempUser[userIndex].interestImg.length > 0)
-            navigation.dispatch(
-              navigation.replace('BottomTabs')
-            )
-          else
-            navigation.dispatch(
-              navigation.replace('InterestScreen')
-            )
-        } else if (c == false) navigation.dispatch(
-          navigation.replace('InterestScreen')
-        );
+          if (tempUser[userIndex].interestImg.length > 0) navigation.dispatch(
+            navigation.replace('BottomTabs')
+          )
+          else navigation.navigate('InterestScreen')
+         
+        } else if (c == false)  navigation.navigate('InterestScreen')
         else console.log('ERROR SOMETHING AT FETCH_DATAPROJECT');
       })
       .catch((error) => {
@@ -626,12 +632,15 @@ const LoginScreen = () => {
     setIsLogin(true);
     dispatch(loginActions.login(true));
     closeLoading();
-    navigation.navigate('SelectScreen');
+    navigation.dispatch(
+      navigation.replace('SelectScreen')
+    )
+
   };
 
   return (
     <>
-      {loginReducer.userloggedIn == true || loading ? (
+      {loginReducer.userloggedIn == true && tempUser[userIndex].interestImg.length > 0 || loading ? (
         <>
           <SafeAreaView style={container1}>
             <StatusBar hidden={true} />

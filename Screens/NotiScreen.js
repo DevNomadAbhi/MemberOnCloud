@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { FontSize } from '../components/FontSizeHelper';
+import { useStateIfMounted } from 'use-state-if-mounted';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
@@ -45,12 +46,12 @@ const NotiScreen = () => {
   const deviceHeight = Dimensions.get('window').height;
   const navigation = useNavigation();
   const [isloading, setIsLoading] = useState(true);
-
+  const [userIndex, setUserIndex] = useStateIfMounted(loginReducer.index);
   const closeLoading = () => {
     setIsLoading(false);
   };
   const fetchImg = async (url, imageext) => {
-    console.log(`fetchImg >> ${url} >> ${imageext}`)
+
     let imgbase64 = null;
     await RNFetchBlob.config({ fileCache: true, appendExt: imageext })
       .fetch(
@@ -75,7 +76,7 @@ const NotiScreen = () => {
   const fetchData = async () => {
     var arrayName = [];
     var arrayGuid = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -111,7 +112,7 @@ const NotiScreen = () => {
   const fetchPage = async (ra) => {
     let redeemGuid = [];
     for (let i in ra) {
-      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+      await fetch(databaseReducer.Data.urlser + '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -130,16 +131,42 @@ const NotiScreen = () => {
         .then((response) => response.json())
         .then(async (json) => {
           let responseData = JSON.parse(json.ResponseData);
-          let jsonObj = {
-            id: i,
-            guid: responseData.SHOWPAGE.SHWPH_GUID,
-            name: responseData.SHOWPAGE.SHWPH_TTL_CPTN,
-            eName: responseData.SHOWPAGE.SHWPH_TTL_ECPTN,
-            details: responseData.SHOWPAGE.SHWPH_EXPLAIN,
-            imageext: responseData.SHOWPAGE.IMAGEEXT,
-            img: 'file://' + (await fetchImg(responseData.SHOWPAGE.SHWPH_GUID, responseData.SHOWPAGE.IMAGEEXT)),
-          };
-          redeemGuid.push(jsonObj);
+          if (responseData.SHOWPAGE.SHWPH_CODE.includes('MB_NOTI_ALL_')) {
+            let jsonObj = {
+              id: i,
+              guid: responseData.SHOWPAGE.SHWPH_GUID,
+              name: responseData.SHOWPAGE.SHWPH_TTL_CPTN,
+              eName: responseData.SHOWPAGE.SHWPH_TTL_ECPTN,
+              details: responseData.SHOWPAGE.SHWPH_EXPLAIN,
+              imageext: responseData.SHOWPAGE.IMAGEEXT,
+              img: 'file://' + (await fetchImg(responseData.SHOWPAGE.SHWPH_GUID, responseData.SHOWPAGE.IMAGEEXT)),
+            };
+
+            redeemGuid.push(jsonObj);
+          } else {
+
+            let tempItem = userReducer.userData[userIndex].interestImg
+            for (let i in tempItem) {
+              for (let j in tempItem[i]) {
+                if (tempItem[i][j].check == true) {
+                  if (responseData.SHOWPAGE.SHWPH_CODE.includes(tempItem[i][j].CODE.split('MB_')[1])) {
+                    let jsonObj = {
+                      id: i,
+                      guid: responseData.SHOWPAGE.SHWPH_GUID,
+                      name: responseData.SHOWPAGE.SHWPH_TTL_CPTN,
+                      eName: responseData.SHOWPAGE.SHWPH_TTL_ECPTN,
+                      details: responseData.SHOWPAGE.SHWPH_EXPLAIN,
+                      imageext: responseData.SHOWPAGE.IMAGEEXT,
+                      img: 'file://' + (await fetchImg(responseData.SHOWPAGE.SHWPH_GUID, responseData.SHOWPAGE.IMAGEEXT)),
+                    };
+
+                    redeemGuid.push(jsonObj);
+                  }
+                }
+                console.log(` `)
+              }
+            }
+          }
         })
         .catch((error) => {
           console.error(error);

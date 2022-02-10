@@ -50,8 +50,7 @@ export const fetchTsMember = async (http, phoneNum, password, GUIDResult) => {
           .then((response) => response.json())
           .then((json) => {
             let responseData2 = JSON.parse(json.ResponseData);
-            console.log('responseData2 ### ' + 200);
-            if (json && json.ResponseCode == '200') {
+             if (json && json.ResponseCode == '200') {
               xresult = responseData2.ShowMemberInfo[0];
             } else {
               console.log(json.ReasonString);
@@ -61,8 +60,7 @@ export const fetchTsMember = async (http, phoneNum, password, GUIDResult) => {
             console.log('ERROR FETCH ShowMemberInfo: ' + error);
           });
       } else {
-        console.log(json.ReasonString);
-      }
+       }
     })
     .catch((error) => console.log('ERROR FETCH LoginByMobile : ' + error));
   return xresult;

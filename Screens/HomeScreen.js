@@ -65,17 +65,24 @@ const HomeScreen = () => {
   );
 
   useEffect(() => {
+
     stack();
   }, []);
   useEffect(() => {
-    console.log(` `)
-    console.log(`loginReducer.jsonResult ${databaseReducer.Data.urlser}`)
-    for (var i in loginReducer.jsonResult){
-      console.log(` loginReducer.jsonResult[${i}].guid >> ${loginReducer.jsonResult[i].guid}`)
-      console.log(` ${loginReducer.jsonResult[i].img}`)
+    let item = userReducer.userData[userIndex].interestImg
+    for (let i in item) {
+      for (let j in item[i]) {
+        if (item[i][j].check == true) {
+          let tempItem = item[i][j].CODE.split('MB_')
+          console.log(` `)
+          console.log(tempItem)
+          console.log(` `)
+        }
+      }
       console.log(` `)
     }
-    console.log(` `)
+
+
   }, [])
 
   const updatePopUpCheck = () => {
@@ -116,7 +123,7 @@ const HomeScreen = () => {
 
   const fetchDataPopUpImg = async () => {
     let ra = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -149,7 +156,7 @@ const HomeScreen = () => {
   const fetchActivityData = async () => {
     let arrayName = [];
     let arrayGuid = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -202,7 +209,7 @@ const HomeScreen = () => {
   };
 
   const renderItem2 = ({ item }) => {
- 
+
     return (
       <View>
         <TouchableOpacity onPress={() => setSelectedId(item.id)}>
@@ -298,7 +305,7 @@ const HomeScreen = () => {
   const fetchActivityPage = async (ra3) => {
     let redeemGuid = [];
     for (let i in ra3) {
-      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+      await fetch(databaseReducer.Data.urlser + '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -476,7 +483,7 @@ const HomeScreen = () => {
                 uri: menuImg.length
                   ? Platform.OS === 'ios'
                     ? menuImg[2].img
-                    : 'file://' +menuImg[2].img
+                    : 'file://' + menuImg[2].img
                   : null,
               }}></Image>
             <Text style={{ color: 'black' }}>
