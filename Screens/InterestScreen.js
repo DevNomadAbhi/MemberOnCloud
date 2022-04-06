@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -9,31 +9,31 @@ import {
   Alert,
   FlatList,
 } from 'react-native';
-import { Header, Button, Body, Picker, Left, Right, Title } from 'native-base';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {Header, Button, Body, Picker, Left, Right, Title} from 'native-base';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   TouchableNativeFeedback,
   TouchableOpacity,
 } from 'react-native-gesture-handler';
 import Colors from '../src/Colors';
-import { useNavigation } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
-import { FontSize } from '../components/FontSizeHelper';
-import { connect } from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector, useDispatch} from 'react-redux';
+import {FontSize} from '../components/FontSizeHelper';
+import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as InterestActions from '../src/actions/interestActions';
 import * as userActions from '../src/actions/userActions';
 import RNFetchBlob from 'rn-fetch-blob';
-import { Language } from '../translations/I18n';
+import {Language} from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 const InterestScreen = () => {
   const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
-  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
-  const interestReducer = useSelector(({ interestReducer }) => interestReducer);
+  const loginReducer = useSelector(({loginReducer}) => loginReducer);
+  const interestReducer = useSelector(({interestReducer}) => interestReducer);
   const [selectedId, setSelectedId] = useState(null);
-  const userReducer = useSelector(({ userReducer }) => userReducer);
+  const userReducer = useSelector(({userReducer}) => userReducer);
   const [userIndex, setUserIndex] = useState(loginReducer.index);
   const [loading, setLoading] = useState(true);
   const [marker, setMarker] = useState(false);
@@ -57,12 +57,7 @@ const InterestScreen = () => {
       let tempUser = userReducer.userData;
       tempUser[userIndex].interestImg = resultJson;
       dispatch(userActions.setUserData(tempUser));
-
-      navigation.dispatch(
-        navigation.replace('LoginScreen')
-      )
-
-
+      navigation.navigate('BottomTabs');
     }
   };
   const closeLoading = () => {
@@ -71,7 +66,7 @@ const InterestScreen = () => {
   const fetchImg = async (url) => {
     let rt = null;
 
-    await RNFetchBlob.config({ fileCache: true, appendExt: 'png' })
+    await RNFetchBlob.config({fileCache: true, appendExt: 'png'})
       .fetch(
         'GET',
         'http://192.168.0.110:8906/Member/BplusErpDvSvrIIS.dll/DownloadFile',
@@ -89,7 +84,7 @@ const InterestScreen = () => {
   };
 
   const fetchData = async () => {
-    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -110,7 +105,7 @@ const InterestScreen = () => {
         let responseData = JSON.parse(json.ResponseData);
         let h = [];
         for (let i in responseData.SHOWPAGE) {
-          await fetch(databaseReducer.Data.urlser + '/ECommerce', {
+          await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
               'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -131,7 +126,6 @@ const InterestScreen = () => {
               let responseData = JSON.parse(json.ResponseData);
               let jsonObj = {
                 id: responseData.SHOWPAGE.SHWPH_GUID,
-                CODE: responseData.SHOWPAGE.SHWPH_CODE,
                 CPTN: responseData.SHOWPAGE.SHWPH_TTL_CPTN,
                 ECPTN: responseData.SHOWPAGE.SHWPH_TTL_ECPTN,
                 GUID: responseData.SHOWPAGE.SHWPH_GUID,
@@ -170,7 +164,7 @@ const InterestScreen = () => {
     Alert.alert(Language.t('register.alertNextInterestedTitle'));
   }, []);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <View>
         {item.length > 1 ? (
@@ -196,7 +190,7 @@ const InterestScreen = () => {
                 }}></Image>
               {item[0].check ? (
                 <Icon
-                  style={{ position: 'absolute' }}
+                  style={{position: 'absolute'}}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
@@ -234,7 +228,7 @@ const InterestScreen = () => {
                 }}></Image>
               {item[1].check ? (
                 <Icon
-                  style={{ position: 'absolute' }}
+                  style={{position: 'absolute'}}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
@@ -272,7 +266,7 @@ const InterestScreen = () => {
                 }}></Image>
               {item[2].check ? (
                 <Icon
-                  style={{ position: 'absolute' }}
+                  style={{position: 'absolute'}}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
@@ -310,13 +304,12 @@ const InterestScreen = () => {
         }}>
         <Left>
           <Button transparent onPress={() => navigation.goBack()}>
-            <Icon size={35} name="angle-left" />
+            <Icon size={35}  name="angle-left" />
           </Button>
         </Left>
         <Body>
-          <Title style={{
-            color: 'black', fontSize: FontSize.medium,
-          }}>
+          <Title style={{color: 'black', fontSize: FontSize.medium,
+}}>
             {Language.t('interested.header')}
           </Title>
         </Body>
@@ -341,7 +334,7 @@ const InterestScreen = () => {
               borderRadius: 18,
               backgroundColor: '#0288D1',
             }}>
-            <Text style={{ color: 'white', fontSize: 15 }}>
+            <Text style={{color: 'white', fontSize: 15}}>
               {Language.t('alert.next')}
             </Text>
           </View>

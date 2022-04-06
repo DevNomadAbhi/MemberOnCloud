@@ -61,7 +61,8 @@ class DatePicker extends Component {
       listDay: defaultListDay,
       modalVisible: false,
     };
-   }
+    console.log('this State => ', this.state);
+  }
 
   onPickerSelectDay = (value) => {
     const {selectedYear, selectedMonth, selectedDay} = this.state;
