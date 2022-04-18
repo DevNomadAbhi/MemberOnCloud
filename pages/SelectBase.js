@@ -21,7 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import RNRestart from 'react-native-restart';
 
 import { connect } from 'react-redux';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Icons from 'react-native-vector-icons/FontAwesome';
 import Colors from '../src/Colors';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontSize } from '../components/FontSizeHelper';
@@ -61,8 +61,8 @@ const SelectBase = ({ route }) => {
   const [selectlanguage, setlanguage] = useState(Language.getLang() == 'th' ? 'th' : 'en');
   const [basename, setBasename] = useState('');
   const [baseurl, setBsaeurl] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('BUSINESS');
+  const [password, setPassword] = useState('SYSTEM64');
   const [isShowDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useStateIfMounted(false);
   const [loading_backG, setLoading_backG] = useStateIfMounted(true);
@@ -76,7 +76,11 @@ const SelectBase = ({ route }) => {
   const [updateindex, setUpdateindex] = useState(null)
   const image = '../images/UI/endpoint/4x/Asset12_4x.png';
   const setlanguageState = (itemValue) => {
+    setLoading(true)
     dispatch(loginActions.setLanguage(itemValue))
+    navigation.dispatch(
+      navigation.replace('LoginScreen', { Language: itemValue })
+    )
     console.log(itemValue)
   }
   var a = 0
@@ -94,8 +98,10 @@ const SelectBase = ({ route }) => {
     )
   }
   useEffect(() => {
-    if(databaseReducer.Data.nameser)
-    _onPressSelectbaseValue(databaseReducer.Data.nameser)
+    if (databaseReducer.Data.nameser)
+      _onPressSelectbaseValue(databaseReducer.Data.nameser)
+    console.log(username)
+    console.log(password)
   }, []);
 
   useEffect(() => {
@@ -105,13 +111,11 @@ const SelectBase = ({ route }) => {
     }
   }, [route.params?.post]);
   useEffect(() => {
-    if (loginReducer.language &&loginReducer.language != Language.getLang()) {
+    if (loginReducer.language && loginReducer.language != Language.getLang()) {
       console.log('loginReducer.Language >> ', loginReducer.language)
       changeLanguage(loginReducer.language);
       setlanguage(loginReducer.language)
-      RNRestart.Restart();
     }
-
     //backsakura 
   }, [loginReducer.language]);
   const _onPressSelectbaseValue = async (itemValue) => {
@@ -130,8 +134,7 @@ const SelectBase = ({ route }) => {
     } else {
       setBasename('')
       setBsaeurl('')
-      setUsername('')
-      setPassword('')
+
     }
   }
 
@@ -144,7 +147,7 @@ const SelectBase = ({ route }) => {
           Language.t('alert.succeed'),
           Language.t('selectBase.connect') + ' ' + selectbaseValue + ' ' + Language.t('alert.succeed'), [{
             text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
-              navigation.replace('LoginScreen')
+              navigation.replace('LoginScreen', {})
             )
           }]);
 
@@ -235,7 +238,7 @@ const SelectBase = ({ route }) => {
     let temp = []
     let check = false;
     let checktest = false;
- 
+
     if (checkValue() == true) {
       temp = items;
       for (let i in items) {
@@ -364,7 +367,7 @@ const SelectBase = ({ route }) => {
                   Language.t('alert.succeed'),
                   Language.t('selectBase.connect') + ' ' + basename + ' ' + Language.t('alert.succeed'), [{
                     text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
-                      navigation.replace('LoginScreen')
+                      navigation.replace('LoginScreen', {})
                     )
                   }]);
               } else {
@@ -410,26 +413,28 @@ const SelectBase = ({ route }) => {
 
 
       <View style={tabbar}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', }}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}>
-            <FontAwesome name="arrow-left" style={{ color: Colors.backgroundLoginColorSecondary, }} size={FontSize.large} />
+            <Icons size={FontSize.large} name="angle-left" style={{ color: 'black' }} />
+
           </TouchableOpacity>
           <Text
             style={{
               marginLeft: 12,
               fontSize: FontSize.medium,
-              color: Colors.backgroundLoginColorSecondary,
+              color: 'black'
             }}> {Language.t('selectBase.header')}</Text>
         </View>
         <View>
           <Picker
             selectedValue={selectlanguage}
-            style={{ color: Colors.backgroundLoginColorSecondary, width: 110 }}
+            style={{ color: Colors.backgroundLoginColor, width: 100 }}
             mode="dropdown"
-            onValueChange={(itemValue, itemIndex) => Alert.alert('', Language.t('menu.changeLanguage'), [{ text: Language.t('alert.ok'), onPress: () => setlanguageState(itemValue) }, { text: Language.t('alert.cancel'), onPress: () => { } }])} >
-            <Picker.Item label="TH" value="th" />
-            <Picker.Item label="EN" value="en" />
+            onValueChange={(itemValue, itemIndex) => Alert.alert('', Language.t('menu.changeLanguage'), [{ text: Language.t('alert.ok'), onPress: () => setlanguageState(itemValue) }, { text: Language.t('alert.cancel'), onPress: () => { } }])}
+          >
+            <Picker.Item color={Colors.backgroundLoginColor} label="TH" value="th" />
+            <Picker.Item color={Colors.backgroundLoginColor} label="EN" value="en" />
           </Picker>
         </View>
       </View>
@@ -438,7 +443,6 @@ const SelectBase = ({ route }) => {
         <SafeAreaView >
           <KeyboardAvoidingView >
             <View style={styles.body}>
-
               <View style={styles.body1}>
                 <Text style={styles.textTitle}>
                   {Language.t('selectBase.title')} :
@@ -448,19 +452,17 @@ const SelectBase = ({ route }) => {
                 marginTop: 10, flexDirection: 'row',
                 justifyContent: 'center', borderColor: items.length > 0 ? Colors.borderColor : '#979797', backgroundColor: Colors.backgroundColorSecondary, borderWidth: 1, padding: 10, borderRadius: 10,
               }}>
-
                 <Text style={{ fontSize: FontSize.large }}></Text>
-
                 {items.length > 0 ? (
                   <Picker
                     selectedValue={selectbaseValue}
                     enabled={true}
                     mode="dropdown"
-                    state={{ color: Colors.borderColor, backgroundColor: Colors.backgroundColorSecondary }}
+                    state={{ color: Colors.backgroundLoginColor  }}
                     onValueChange={(itemValue, itemIndex) => _onPressSelectbaseValue(itemValue)}>
                     {items.map((obj, index) => {
                       return (
-                        <Picker.Item label={obj.nameser} color={Colors.borderColor} value={obj.nameser} />
+                        <Picker.Item label={obj.nameser} color={Colors.backgroundLoginColor} value={obj.nameser} />
                       )
                     })}
                     {
@@ -508,10 +510,11 @@ const SelectBase = ({ route }) => {
                     paddingRight: 20,
                     paddingTop: 10,
                     paddingBottom: 10,
-
+                    borderColor: 'gray',
+                    borderWidth: 0.7,
 
                   }}>
-                  <View style={{ height: 30, flexDirection: 'row' }}>
+                  <View style={{ height: 30, flexDirection: 'row', }}>
                     <Image
                       style={{ height: 30, width: 30 }}
                       resizeMode={'contain'}
@@ -537,10 +540,11 @@ const SelectBase = ({ route }) => {
                       }}></TextInput>
                     <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => navigation.navigate('ScanScreen', { route: 'SelectScreen' })}>
 
-                      <FontAwesome
+                      <Icons
                         name="qrcode"
                         size={25}
-                        color={Colors.borderColor}
+                        color={Colors.backgroundLoginColor}
+
                       />
 
                     </TouchableOpacity>
@@ -564,8 +568,9 @@ const SelectBase = ({ route }) => {
                     paddingRight: 20,
                     paddingTop: 10,
                     height: 'auto',
-                    paddingBottom: 10
-
+                    paddingBottom: 10,
+                    borderColor: 'gray',
+                    borderWidth: 0.7,
                   }}>
                   <View style={{ height: 'auto', flexDirection: 'row' }}>
                     <Image
@@ -596,112 +601,7 @@ const SelectBase = ({ route }) => {
                   </View>
                 </View>
               </View>
-              <View style={{ marginTop: 10 }}>
-                <Text style={styles.textTitle}>
-                  {Language.t('login.username')} :
-                </Text>
-              </View>
-              <View style={{ marginTop: 10 }}>
-                <View
-                  style={{
-                    backgroundColor: Colors.backgroundColorSecondary,
-                    flexDirection: 'column',
-                    height: 50,
-                    borderRadius: 10,
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10
-                  }}>
-                  <View style={{ height: 30, flexDirection: 'row' }}>
-                    <Image
-                      style={{ height: 30, width: 30 }}
-                      resizeMode={'contain'}
-                      source={require('../images/UI/endpoint/4x/Asset20_4x.png')}
-                    />
-                    <TextInput
-                      style={{
-                        flex: 8,
-                        marginLeft: 5,
-                        borderBottomColor: Colors.borderColor,
-                        color: Colors.fontColor,
-                        paddingVertical: 3,
-                        fontSize: FontSize.medium,
-                        borderBottomWidth: 0.7,
-                      }}
 
-                      placeholderTextColor={Colors.fontColorSecondary}
-
-                      value={username}
-                      placeholder={Language.t('login.username') + '..'}
-                      onChangeText={(val) => {
-                        setUsername(val);
-                      }}></TextInput>
-
-                  </View>
-                </View>
-              </View>
-              <View style={{ marginTop: 10 }}>
-                <Text style={styles.textTitle}>
-                  {Language.t('login.password')} :
-                </Text>
-              </View>
-              <View style={{ marginTop: 10 }}>
-                <View
-                  style={{
-                    backgroundColor: Colors.backgroundColorSecondary,
-                    flexDirection: 'column',
-                    height: 50,
-                    borderRadius: 10,
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: 10,
-                    paddingBottom: 10
-                  }}>
-                  <View style={{ height: 30, flexDirection: 'row' }}>
-                    <Image
-                      style={{ height: 30, width: 30 }}
-                      resizeMode={'contain'}
-                      source={require('../images/UI/endpoint/4x/Asset21_4x.png')}
-                    />
-                    <TextInput
-                      style={{
-                        flex: 8,
-                        marginLeft: 5,
-                        color: Colors.fontColor,
-                        paddingVertical: 3,
-                        fontSize: FontSize.medium,
-                        borderBottomColor: Colors.borderColor,
-                        borderBottomWidth: 0.7,
-                      }}
-                      secureTextEntry={data.secureTextEntry ? true : false}
-                      keyboardType="default"
-
-                      placeholderTextColor={Colors.fontColorSecondary}
-                      placeholder={Language.t('login.password') + '..'}
-                      value={password}
-                      onChangeText={(val) => {
-                        setPassword(val);
-                      }}
-                    />
-
-                    <TouchableOpacity style={{ marginLeft: 10 }} onPress={updateSecureTextEntry}>
-                      {data.secureTextEntry ? (
-                        <FontAwesome
-                          name="eye-slash"
-                          size={25}
-                          color={Colors.borderColor}
-                        />
-                      ) : (
-                        <FontAwesome
-                          name="eye"
-                          size={25}
-                          color={Colors.borderColor} />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
 
 
               <View style={styles.body1e}>
@@ -714,11 +614,11 @@ const SelectBase = ({ route }) => {
                       justifyContent: 'center',
                       height: 50,
                       marginRight: 10, width: deviceWidth - 200,
-                      backgroundColor: Colors.buttonColorPrimary,
+                      backgroundColor: Colors.backgroundLoginColor,
                     }}>
                     <Text
                       style={{
-                        color: Colors.buttonTextColor,
+                        color: Colors.backgroundColorSecondary,
                         alignSelf: 'center',
                         fontSize: FontSize.medium,
                         fontWeight: 'bold',
@@ -739,7 +639,7 @@ const SelectBase = ({ route }) => {
                         justifyContent: 'center',
                         height: 50,
                         width: deviceWidth - 250,
-                        backgroundColor: Colors.backgroundLoginColor,
+                        backgroundColor: Colors.alert,
                       }}>
                       <Text
                         style={{
@@ -768,7 +668,7 @@ const SelectBase = ({ route }) => {
                       }}>
                       <Text
                         style={{
-                          color: '#C5C5C5',
+                          color: Colors.fontColor,
                           alignSelf: 'center',
                           fontSize: FontSize.medium,
                           fontWeight: 'bold',
@@ -822,14 +722,14 @@ const SelectBase = ({ route }) => {
 
 const styles = StyleSheet.create({
   container1: {
-    backgroundColor: '#C8FFFF',
+
     flex: 1,
 
   },
   body: {
     marginLeft: 20,
     marginRight: 20,
-    marginTop:20
+    marginTop: 20
   },
   body1e: {
     marginTop: 20, marginBottom: 20,
@@ -842,12 +742,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tabbar: {
-    height: 70,
-    padding: 12,
+
+    padding: 5,
     paddingLeft: 20,
     alignItems: 'center',
-backgroundColor:'#182626',
-
+    backgroundColor: Colors.backgroundColorSecondary,
+    borderBottomColor: 'gray',
+    borderBottomWidth: 0.7,
     justifyContent: 'space-between',
     flexDirection: 'row',
   },

@@ -21,7 +21,7 @@ class NumberPad extends PureComponent {
   render() {
     const {handlePinCode, fingerPrint} = this.props;
     return (
-      <View style={{flex: 1}}>
+      <View style={{flex: 1,backgroundColor:'#ffffff'}}>
         <View style={styles.row}>
           <TouchableOpacity
             style={{...styles.box}}

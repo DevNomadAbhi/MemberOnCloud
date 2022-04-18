@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-import { StyleSheet, Platform, View, Text, Alert, TouchableOpacity ,
+import {
+  StyleSheet, Platform, View, Text, Alert, TouchableOpacity,
   ScrollView,
   TouchableNativeFeedback,
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 
-import * as  ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-picker';
 
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -68,27 +69,17 @@ const ScanScreen = ({ navigation, route }) => {
       } else if (response.error) {
         console.log('response.error');
       } else {
-        let path = null;
-        if (Platform.OS == 'android') {
-          path = response.assets[0].path;
-          if (!path) {
-            path = response.assets[0].uri;
-          }
-        } else {
-          path = response.path;
-          if (!path) {
-            path = response.uri;
-          }
+        let path = response.path;
+        if (!path) {
+          path = response.uri;
         }
-
-
+       
         QRreader(path)
           .then((data) => {
             if (data) {
               let result = Base64.decode(Base64.decode(data)).split('|')
               if (result[0].indexOf('.dll') == -1) {
                 Alert.alert(Language.t('alert.errorTitle'), Language.t('selectBase.invalid'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-
               } else {
                 let tempurl = result[0].split('.dll')
                 let serurl = tempurl[0] + '.dll'
@@ -98,12 +89,15 @@ const ScanScreen = ({ navigation, route }) => {
                 let newObj = { label: serurl, value: urlnmae[0] };
                 navigation.navigate(route.params.route, { post: newObj, data: a });
               }
+            }else{
+              Alert.alert(Language.t('alert.errorTitle'), Language.t('selectBase.notfound'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
             }
           })
           .catch((error) => {
             console.log(error);
+            Alert.alert(Language.t('alert.errorTitle'), Language.t('selectBase.notfound'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
           });
-
+         
       }
     });
   };

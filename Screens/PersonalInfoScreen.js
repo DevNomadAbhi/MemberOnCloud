@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -16,34 +16,35 @@ import {
   TouchableOpacity,
 } from 'react-native-gesture-handler';
 import Dialog from 'react-native-dialog';
-import {FontSize} from '../components/FontSizeHelper';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {Header, 
-  Button, 
-  Body, 
-  Left, 
-  Right, 
+import { FontSize } from '../components/FontSizeHelper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Header,
+  Button,
+  Body,
+  Left,
+  Right,
   Title,
- 
+  Picker,
 } from 'native-base';
-import { Picker,} from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
  
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import DatePicker from '../components/DatePicker';
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Colors from '../src/Colors';
 import * as InterestActions from '../src/actions/interestActions';
 import * as userActions from '../src/actions/userActions';
-import {connect} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import {Language} from '../translations/I18n';
+import { connect } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { Language } from '../translations/I18n';
 import * as Constants from '../src/Constants';
 
 const PersonalInfoScreen = () => {
   const navigation = useNavigation();
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
-  const userReducer = useSelector(({userReducer}) => userReducer);
-  const interestReducer = useSelector(({interestReducer}) => interestReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
+  const userReducer = useSelector(({ userReducer }) => userReducer);
+  const interestReducer = useSelector(({ interestReducer }) => interestReducer);
   const [userIndex, setUserIndex] = useState(loginReducer.index);
   const [selectedId, setSelectedId] = useState(null);
   const [isShowDialog, setShowDialog] = useState(false);
@@ -72,7 +73,7 @@ const PersonalInfoScreen = () => {
   });
   const [gender, setGender] = useState('');
   const addGender = () => {
-   
+
     if (userReducer.userData[userIndex].title == 'นาย') {
       Language.getLang() == 'th' ? setGender('ชาย') : setGender('Male');
     } else if (
@@ -93,7 +94,7 @@ const PersonalInfoScreen = () => {
     setShowDialog(false);
   };
 
-  const _setDispatch = async () => {  
+  const _setDispatch = async () => {
     let tempUser = userReducer.userData;
     if (newData.title == data.title) {
       tempUser[userIndex].title = data.title;
@@ -147,11 +148,11 @@ const PersonalInfoScreen = () => {
       tempUser[userIndex].sex = 'F';
     }
     const navi = 'Menu';
-    const newnvi = { navi , tempUser };
-    navigation.navigate('AuthenticationScreen', {navi: newnvi});
+    const newnvi = { navi, tempUser };
+    navigation.navigate('AuthenticationScreen', { navi: newnvi });
   };
   const onChangeData = (date) => {
-    setNewData({...newData, birthDate: date});
+    setNewData({ ...newData, birthDate: date });
   };
   const _onClick = (i, index) => {
     let temp = interestReducer.interestImg;
@@ -173,7 +174,7 @@ const PersonalInfoScreen = () => {
     );
   }, []);
 
-  const renderItem = ({item, index}) => {
+  const renderItem = ({ item, index }) => {
     return (
       <View>
         {item.length > 1 ? (
@@ -199,14 +200,14 @@ const PersonalInfoScreen = () => {
                 }}></Image>
               {item[0].check ? (
                 <Icon
-                  style={{position: 'absolute'}}
+                  style={{ position: 'absolute' }}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
                 />
               ) : null}
               <Text
-                style={{color: 'black', textAlign: 'center', marginBottom: 5}}>
+                style={{ color: 'black', textAlign: 'center', marginBottom: 5 }}>
                 {Language.getLang() === 'th' ? item[0].CPTN : item[0].ECPTN}
               </Text>
             </TouchableOpacity>
@@ -231,14 +232,14 @@ const PersonalInfoScreen = () => {
                 }}></Image>
               {item[1].check ? (
                 <Icon
-                  style={{position: 'absolute'}}
+                  style={{ position: 'absolute' }}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
                 />
               ) : null}
               <Text
-                style={{color: 'black', textAlign: 'center', marginBottom: 5}}>
+                style={{ color: 'black', textAlign: 'center', marginBottom: 5 }}>
                 {Language.getLang() === 'th' ? item[1].CPTN : item[1].ECPTN}
               </Text>
             </TouchableOpacity>
@@ -264,14 +265,14 @@ const PersonalInfoScreen = () => {
                 }}></Image>
               {item[2].check ? (
                 <Icon
-                  style={{position: 'absolute'}}
+                  style={{ position: 'absolute' }}
                   name="check-circle"
                   size={25}
                   color="#0288D1"
                 />
               ) : null}
               <Text
-                style={{color: 'black', textAlign: 'center', marginBottom: 5}}>
+                style={{ color: 'black', textAlign: 'center', marginBottom: 5 }}>
                 {Language.getLang() === 'th' ? item[2].CPTN : item[2].ECPTN}
               </Text>
             </TouchableOpacity>
@@ -304,12 +305,12 @@ const PersonalInfoScreen = () => {
           </Button>
         </Left>
         <Body>
-          <Title style={{color: 'black'}}>{Language.t('profile.header')}</Title>
+          <Title style={{ color: 'black' }}>{Language.t('profile.header')}</Title>
         </Body>
         <Right />
       </Header>
       <FlatList
-        ListHeaderComponentStyle={{padding: 15}}
+        ListHeaderComponentStyle={{ padding: 15 }}
         ListHeaderComponent={
           <>
             <View
@@ -319,7 +320,7 @@ const PersonalInfoScreen = () => {
                 alignItems: 'center',
               }}>
               <Icon name="user" size={25} color="#0288D1" />
-              <Text style={{marginLeft: 10, fontSize: FontSize.medium}}>
+              <Text style={{ marginLeft: 10, fontSize: FontSize.medium }}>
                 {Language.t('profile.headerPersonalInformation')}
               </Text>
             </View>
@@ -348,7 +349,7 @@ const PersonalInfoScreen = () => {
                     placeholder={newData.title}
                     selectedValue={newData.title}
                     onValueChange={(item) => {
-                      setNewData({...newData, title: item});
+                      setNewData({ ...newData, title: item });
                       if (item == 'นาย') {
                         Language.getLang() == 'th' ? setGender('ชาย') : setGender('Male');
                       } else if (
@@ -390,7 +391,7 @@ const PersonalInfoScreen = () => {
                     selectedValue={newData.title}
                     mode="dropdown"
                     onValueChange={(item) => {
-                      setNewData({...newData, title: item});
+                      setNewData({ ...newData, title: item });
                       if (item == 'นาย') {
                         Language.getLang() == 'th' ? setGender('ชาย') : setGender('Male');
                       } else if (
@@ -434,7 +435,7 @@ const PersonalInfoScreen = () => {
               value={newData.firstName}
               placeholder={data.firstName}
               onChangeText={(val) => {
-                setNewData({...newData, firstName: val});
+                setNewData({ ...newData, firstName: val });
               }}
               style={styles.textInput}></TextInput>
 
@@ -445,7 +446,7 @@ const PersonalInfoScreen = () => {
               value={newData.lastName}
               placeholder={data.lastName}
               onChangeText={(val) => {
-                setNewData({...newData, lastName: val});
+                setNewData({ ...newData, lastName: val });
               }}
               style={styles.textInput}></TextInput>
 
@@ -465,7 +466,7 @@ const PersonalInfoScreen = () => {
               value={newData.ADDR_1}
               placeholder={data.ADDR_1}
               onChangeText={(val) => {
-                setNewData({...newData, ADDR_1: val});
+                setNewData({ ...newData, ADDR_1: val });
               }}
               style={styles.textInput}></TextInput>
 
@@ -478,7 +479,7 @@ const PersonalInfoScreen = () => {
               value={newData.ADDR_2}
               placeholder={data.ADDR_2}
               onChangeText={(val) => {
-                setNewData({...newData, ADDR_2: val});
+                setNewData({ ...newData, ADDR_2: val });
               }}
               style={styles.textInput}></TextInput>
             <Text style={styles.textTitle}>
@@ -488,7 +489,7 @@ const PersonalInfoScreen = () => {
               value={newData.ADDR_3}
               placeholder={data.ADDR_3}
               onChangeText={(val) => {
-                setNewData({...newData, ADDR_3: val});
+                setNewData({ ...newData, ADDR_3: val });
               }}
               style={styles.textInput}></TextInput>
 
@@ -501,7 +502,7 @@ const PersonalInfoScreen = () => {
               value={newData.postCode}
               placeholder={data.postCode}
               onChangeText={(val) => {
-                setNewData({...newData, postCode: val});
+                setNewData({ ...newData, postCode: val });
               }}
               style={styles.textInput}></TextInput>
             <Text style={styles.textTitle}>{Language.t('profile.email')}</Text>
@@ -510,12 +511,12 @@ const PersonalInfoScreen = () => {
               placeholder={data.email}
               keyboardType="email-address"
               onChangeText={(val) => {
-                setNewData({...newData, email: val});
+                setNewData({ ...newData, email: val });
               }}
               style={styles.textInput}></TextInput>
 
             <Text
-              style={{marginTop: 10, fontSize: FontSize.medium, padding: 5}}>
+              style={{ marginTop: 10, fontSize: FontSize.medium, padding: 5 }}>
               {Language.t('interested.header')}
             </Text>
           </>

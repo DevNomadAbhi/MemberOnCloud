@@ -21,6 +21,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {FontSize} from '../components/FontSizeHelper';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import * as loginActions from '../src/actions/loginActions';
 import * as InterestActions from '../src/actions/interestActions';
 import * as userActions from '../src/actions/userActions';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -57,7 +58,11 @@ const InterestScreen = () => {
       let tempUser = userReducer.userData;
       tempUser[userIndex].interestImg = resultJson;
       dispatch(userActions.setUserData(tempUser));
-      navigation.navigate('BottomTabs');
+      dispatch(loginActions.userlogin(true));
+      navigation.dispatch(
+        navigation.replace('BottomTabs')
+      )
+    
     }
   };
   const closeLoading = () => {

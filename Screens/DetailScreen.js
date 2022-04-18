@@ -38,7 +38,7 @@ const DetailScreen = ({ route }) => {
     dispatch(loginActions.password(''))
     dispatch(loginActions.userlogin(false))
     navigation.dispatch(
-      navigation.replace('LoginScreen')
+      navigation.replace('LoginScreen', {  })
     )
     setLoading(false)
   };
@@ -168,7 +168,7 @@ const DetailScreen = ({ route }) => {
             <Text>{Language.t('changeLanguage.header')}</Text>
             {Language.getLang() === 'th' ? (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: 15 }}>ภาษาไทย</Text>
+                <Text style={{ marginRight: 15,color:Colors.fontColor2 }}>ภาษาไทย</Text>
                 <FontAwesome
                   name="arrow-right"
                   size={Platform.OS === 'ios' ? 10 : 15}
@@ -177,7 +177,7 @@ const DetailScreen = ({ route }) => {
               </View>
             ) : (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: 15 }}>English</Text>
+                <Text style={{ marginRight: 15,color:Colors.fontColor }}>English</Text>
                 <FontAwesome
                   name="arrow-right"
                   size={Platform.OS === 'ios' ? 10 : 15}

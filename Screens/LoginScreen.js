@@ -19,8 +19,9 @@ import {
   TouchableOpacity,
 } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Language } from '../translations/I18n';
 import DeviceInfo from 'react-native-device-info';
+import { NetworkInfo } from "react-native-network-info";
+
 import RNFetchBlob from 'rn-fetch-blob';
 import { useStateIfMounted } from 'use-state-if-mounted';
 import * as TouchId from '../components/TouchId';
@@ -35,16 +36,15 @@ import * as userActions from '../src/actions/userActions';
 import * as interestActions from '../src/actions/interestActions';
 import * as registerActions from '../src/actions/registerActions';
 import { TERM_CONDITION } from '../src/Constants';
-import { changeLanguage } from '../translations/I18n';
+import { Language, changeLanguage } from '../translations/I18n';
 import Colors from '../src/Colors';
-import ImagePicker from 'react-native-image-picker';
-import SelectBase from '../pages/SelectBase';
+
 import { fetchTsMember } from '../components/fetchTsMember';
 import { FontSize } from '../components/FontSizeHelper';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const LoginScreen = () => {
+const LoginScreen = ({ route }) => {
   const registerReducer = useSelector(({ registerReducer }) => registerReducer);
   const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const interestReducer = useSelector(({ interestReducer }) => interestReducer);
@@ -92,22 +92,48 @@ const LoginScreen = () => {
   };
   const letsLoading = () => {
     setLoading(true);
-  };
+  }
 
   useEffect(() => {
+    if (registerReducer.machineNum.length == 0)
+      getMac()
+  }, [])
 
+  useEffect(() => {
+    if (route.params?.language) {
+      changeLanguage(route.params.language)
+      dispatch(loginActions.setLanguage(itemValue))
+    }
+
+  }, [route.params?.language])
+
+  useEffect(() => {
+    console.log(loginReducer.language)
     letsLoading()
     _Checkstate()
-
-    if (userIndex === '-1') {
-      changeLanguage('th');
-    } else {
-      changeLanguage(userReducer.userData[userIndex].language);
-    }
     return () => {
       isLogin;
     }
   }, [])
+
+  const getMac = async () => {
+    var lodstr = ''
+    for (var i = 0; i < 100; i++) {
+      lodstr += '_'
+    }
+    await DeviceInfo.getMacAddress().then((mac) => {
+      var a = Math.floor(100000 + Math.random() * 900000);
+      console.log(DeviceInfo.getDeviceName())
+      console.log('\nmachine > > ' + mac + ':' + a)
+      if (mac.length > 0) dispatch(registerActions.machine(mac + ':' + a));
+      else NetworkInfo.getBSSID().then(macwifi => {
+        console.log('\nmachine(wifi) > > ' + macwifi + ':' + a)
+        if (macwifi.length > 0) dispatch(registerActions.machine(macwifi + ':' + a));
+        else dispatch(registerActions.machine('9b911981-afbf-42d4-9828-0924a112d48e' + ':' + a));
+      }).catch((e) => dispatch(registerActions.machine('9b911981-afbf-42d4-9828-0924a112d48e' + ':' + a)));
+    }).catch((e) => dispatch(registerActions.machine('9b911981-afbf-42d4-9828-0924a112d48e' + ':' + a)));
+  }
+
 
   const _Checkstate = async () => {
     console.log(`userloggedIn >> ${loginReducer.userloggedIn}`)
@@ -118,6 +144,7 @@ const LoginScreen = () => {
     } else {
       closeLoading()
     }
+
   }
   const _onPressLogin = async (username, password) => {
     let GUIDr = '';
@@ -181,6 +208,7 @@ const LoginScreen = () => {
         setLoading(false)
       });
   };
+
 
   const _fetchGuidLog = async (username) => {
     console.log('FETCH GUID LOGIN');
@@ -280,6 +308,7 @@ const LoginScreen = () => {
                 } else {
                   console.log(json.ReasonString);
                 }
+                setLoading(false)
               })
               .catch((error) => {
                 if (databaseReducer.Data.urlser == '') {
@@ -290,7 +319,7 @@ const LoginScreen = () => {
                   Alert.alert(
                     Language.t('alert.errorTitle'),
                     Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                } 
+                }
                 console.log('ERROR FETCH LoginByMobile : ' + error)
                 setLoading(false)
               }
@@ -308,8 +337,6 @@ const LoginScreen = () => {
         }
       });
   };
-
-
 
   const _onPressRegis = async (MB_LOGIN_GUID, GUID) => {
     console.log(`_onPressRegis`)
@@ -374,6 +401,9 @@ const LoginScreen = () => {
             temp.push(newUser);
             dispatch(userActions.setUserData(temp));
             Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            navigation.dispatch(
+              navigation.replace(navi.navi)
+            )
             navigation.navigate(navi.navi);
           } else {
             for (let i in temp) {
@@ -391,10 +421,7 @@ const LoginScreen = () => {
             navigation.navigate(navi.navi);
           }
         }
-        if (json.ResponseCode == '635') {
-        } else {
-          console.log("json.ReasonString");
-        }
+        setLoading(false)
       })
       .catch((error) => {
 
@@ -518,8 +545,7 @@ const LoginScreen = () => {
 
     if (count == false) {
 
-      // dispatch(loginActions.userlogin(false))
-      // dispatch(loginActions.guid(''));
+     
       closeLoading();
       dispatch(loginActions.userName(''));
       dispatch(loginActions.password(''));
@@ -569,7 +595,7 @@ const LoginScreen = () => {
 
         closeLoading();
         if (c == true) {
-          dispatch(loginActions.userlogin(true));
+        
           if (tempUser[userIndex].interestImg.length > 0)
             navigation.dispatch(
               navigation.replace('BottomTabs')
@@ -748,7 +774,6 @@ const LoginScreen = () => {
                     }}
                     secureTextEntry={data.secureTextEntry ? true : false}
                     keyboardType="default"
-                    maxLength={8}
                     placeholderTextColor={Colors.fontColorSecondary}
                     placeholder={Language.t('login.password')}
                     onChangeText={(val) => {

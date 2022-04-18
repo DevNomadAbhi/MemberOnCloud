@@ -73,7 +73,7 @@ const SelectLanguageScreen = () => {
                   />
                 )}
               </View>
-              <Text style={{fontSize: FontSize.medium, color: Colors.textColor}}>
+              <Text style={{fontSize: FontSize.medium, color: Colors.fontColor}}>
                 ภาษาไทย
               </Text>
             </Left>
@@ -94,7 +94,7 @@ const SelectLanguageScreen = () => {
                   />
                 )}
               </View>
-              <Text style={{fontSize: FontSize.medium, color: Colors.textColor}}>
+              <Text style={{fontSize: FontSize.medium, color: Colors.fontColor}}>
                 English
               </Text>
             </Left>

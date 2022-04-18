@@ -12,7 +12,8 @@ import {
   ACTION_SET_INDEX,
   ACTION_SET_IP_ADDRESS,
   ACTION_SET_FINGERPRINT,
-  ACTION_SET_SCREEN
+  ACTION_SET_SCREEN,
+  ACTION_SET_LANGUAGE
 } from '../Constants';
 
 export const login = (payload) => ({
@@ -69,5 +70,9 @@ export const setFingerprint = (payload) => ({
 });
 export const setScreen = (payload) => ({
   type: ACTION_SET_SCREEN,
+  payload,
+});
+export const setLanguage = (payload) => ({
+  type: ACTION_SET_LANGUAGE,
   payload,
 });

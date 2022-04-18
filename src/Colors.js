@@ -19,8 +19,8 @@ export default {
   textColor: "#292F39",
   itemColor: "#B3E5FD",
   linkColor: "#0077c2",
-  // buttonColor: "#0288D1",
-  // textColor: "#FFFFFF",
+  buttonColor: "#0288D1",
+  textColor: "#FFFFFF",
   textColorSecondary: "#BDBDBD",
   inputText: "#757575",
   buttonColorSecondary: "#448AFF",
@@ -28,6 +28,6 @@ export default {
   // backgroundColor: "#F1F1F1",
   headerColor: "#E86C2C",
   headerColor2: "#E8995E",
-  alert: "rgba(255,0,0,0.8)"
+  alert: "rgba(222,40,40,0.8)"
   // menuButton : "rgba(2, 136, 209, 0.7)"
 };

@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
-  Animated,
   FlatList,
   Platform,
+  Animated,
   ImageBackground,
   StatusBar
 } from 'react-native';
@@ -20,12 +20,12 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { connect } from 'react-redux';
 import { useSelector, useDispatch } from 'react-redux';
-import ImagePicker from 'react-native-image-picker';
+import  ImagePicker from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Language } from '../translations/I18n';
 import * as loginActions from '../src/actions/loginActions';
 import * as activityActions from '../src/actions/activityActions';
-import * as userActions from '../src/actions/userActions';
+import * as userActions from '../src/actions/userActions';  
 import Colors from '../src/Colors';
 const deviceWidth = Dimensions.get('screen').width;
 const deviceHeight = Dimensions.get('screen').height;
@@ -63,14 +63,17 @@ const HomeScreen = () => {
       ? userReducer.userData[userIndex].userImg
       : '',
   );
-
+  useEffect(() => {
+    console.log()
+    console.log('filePath > ', filePath)
+  }, []);
   useEffect(() => {
     stack();
   }, []);
   useEffect(() => {
     console.log(` `)
     console.log(`loginReducer.jsonResult ${databaseReducer.Data.urlser}`)
-    for (var i in loginReducer.jsonResult){
+    for (var i in loginReducer.jsonResult) {
       console.log(` loginReducer.jsonResult[${i}].guid >> ${loginReducer.jsonResult[i].guid}`)
       console.log(` ${loginReducer.jsonResult[i].img}`)
       console.log(` `)
@@ -116,7 +119,7 @@ const HomeScreen = () => {
 
   const fetchDataPopUpImg = async () => {
     let ra = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -149,7 +152,7 @@ const HomeScreen = () => {
   const fetchActivityData = async () => {
     let arrayName = [];
     let arrayGuid = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -202,7 +205,7 @@ const HomeScreen = () => {
   };
 
   const renderItem2 = ({ item }) => {
- 
+
     return (
       <View>
         <TouchableOpacity onPress={() => setSelectedId(item.id)}>
@@ -298,7 +301,7 @@ const HomeScreen = () => {
   const fetchActivityPage = async (ra3) => {
     let redeemGuid = [];
     for (let i in ra3) {
-      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+      await fetch(databaseReducer.Data.urlser + '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -382,7 +385,7 @@ const HomeScreen = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('PersonalInfo')}>
               <Text style={{ fontSize: FontSize.medium }}>
-                {Language.t('main.member')}
+              {userReducer.userData[userIndex].firstName?userReducer.userData[userIndex].firstName.length>5?(userReducer.userData[userIndex].firstName.substring(0,5)+'..'):userReducer.userData[userIndex].firstName:Language.t('main.member')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -409,7 +412,7 @@ const HomeScreen = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('PersonalInfo')}>
               <Text style={{ marginLeft: 12, fontSize: FontSize.medium }}>
-                {Language.t('main.member')}
+                {userReducer.userData[userIndex].firstName?userReducer.userData[userIndex].firstName:Language.t('main.member')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -476,7 +479,7 @@ const HomeScreen = () => {
                 uri: menuImg.length
                   ? Platform.OS === 'ios'
                     ? menuImg[2].img
-                    : 'file://' +menuImg[2].img
+                    : 'file://' + menuImg[2].img
                   : null,
               }}></Image>
             <Text style={{ color: 'black' }}>

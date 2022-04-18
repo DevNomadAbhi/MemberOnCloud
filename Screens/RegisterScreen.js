@@ -60,16 +60,15 @@ const RegisterScreen = () => {
   const [data3, setdata3] = useState(false);
 
   const [newData, setNewData] = useState({
-    title: '',
-    firstName: '',
-    lastName: '',
     password: '',
     birthDate: moment().format('YYYYMMDD'),
     phoneNum: '',
     idCard: '',
 
   });
-
+  useEffect(() => {
+    console.log(registerReducer)
+  }, [])
   const textInputChange = (val) => {
     if (val.length !== 0) {
       setData({
@@ -130,7 +129,7 @@ const RegisterScreen = () => {
         if (json.ResponseCode == 200 && json.ReasonString == 'Completed') {
           await _fetchGuidLogin();
         } else {
-          console.log('REGISTER MAC FAILED');
+          console.log('REGISTER MAC FAILED', json.ResponseCode);
         }
       })
       .catch((error) => {
@@ -164,6 +163,7 @@ const RegisterScreen = () => {
         loginReducer.passwordSer +
         '"}',
     }))
+    console.log(registerReducer.machineNum)
     let GUID = '';
     await fetch(databaseReducer.Data.urlser + '/DevUsers', {
       method: 'POST',
@@ -186,6 +186,8 @@ const RegisterScreen = () => {
         let responseData = JSON.parse(json.ResponseData);
         setGUID(responseData.BPAPUS_GUID);
         GUID = responseData.BPAPUS_GUID;
+        console.log()
+        console.log(`GUID >> ${GUID}`)
       })
       .catch((error) => {
         console.error('ERROR at _fetchGuidLogin' + error);
@@ -200,11 +202,12 @@ const RegisterScreen = () => {
         }
         setLoading(false)
       });
+
     await fetchUserData(GUID);
   };
 
   const fetchUserData = async (GUID) => {
-    console.log('FETCH /LookupErp');
+    console.log('FETCH /LookupErp', databaseReducer.Data.urlser);
     let xresult = '';
 
     await fetch(databaseReducer.Data.urlser + '/LookupErp', {
@@ -260,6 +263,7 @@ const RegisterScreen = () => {
                 } else {
                   console.log(json.ReasonString);
                 }
+                setLoading(false)
               })
               .catch((error) => {
                 if (databaseReducer.Data.urlser == '') {
@@ -288,16 +292,6 @@ const RegisterScreen = () => {
       });
   };
 
-  const getMacAddress = async () => {
-    await DeviceInfo.getMacAddress().then((androidId) => {
-      dispatch(registerActions.machine(androidId));
-      setMachineNo(androidId);
-    });
-  };
-
-  useEffect(() => {
-    getMacAddress();
-  }, []);
 
   const checKPassword = () => {
     setLoading(true)
@@ -349,6 +343,7 @@ const RegisterScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fffff' }}>
+
       <Header
         style={{
           backgroundColor: Colors.backgroundColorSecondary,
@@ -358,17 +353,18 @@ const RegisterScreen = () => {
 
         <Left>
           <Button transparent onPress={() => navigation.goBack()}>
-            <Icons size={35} name="angle-left" />
+            <Icons size={FontSize.large} name="angle-left" style={{ color: 'black' }} />
           </Button>
         </Left>
         <Body>
-          <Title style={{ color: 'black' }}>
+          <Title style={{ color: 'black', fontSize: FontSize.medium }}>
             {Language.t('register.header')}
           </Title>
         </Body>
         <Right />
       </Header>
-      <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
+
+      <KeyboardAvoidingView keyboardVerticalOffset={1}  >
         <View style={{ backgroundColor: '#fffff' }} >
 
           {Platform.OS === 'ios' ? (
@@ -392,12 +388,19 @@ const RegisterScreen = () => {
                     <Text style={styles.textTitle}>
                       {Language.t('register.mobileNo')}
                     </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        padding: 2,
-                        alignItems: 'center',
-                      }}>
+                    <View style={{
+                      backgroundColor: Colors.backgroundColorSecondary,
+                      marginTop: 5,
+                      borderRadius: 10,
+                      paddingLeft: 20,
+                      paddingRight: 20,
+                      paddingTop: 10,
+                      height: 'auto',
+                      paddingBottom: 10,
+                      borderColor: 'gray',
+                      borderWidth: 0.7,
+                      flexDirection: 'row',
+                    }}>
                       <TextInput
                         style={styles.textInput}
                         keyboardType="number-pad"
@@ -425,31 +428,52 @@ const RegisterScreen = () => {
                     <Text style={styles.textTitle}>
                       {Language.t('register.idCard')}
                     </Text>
-                    <TextInput
-                      placeholderTextColor={Colors.fontColorSecondary}
-                      maxLength={13}
-                      keyboardType="number-pad"
-                      placeholder={Language.t('register.validationEmptyIdCard')}
-                      onChangeText={(val) => {
-                        setNewData({ ...newData, idCard: val });
-                      }}
-                      style={styles.textInput}></TextInput>
+                    <View style={{
+                      backgroundColor: Colors.backgroundColorSecondary,
+                      marginTop: 5,
+                      borderRadius: 10,
+                      paddingLeft: 20,
+                      paddingRight: 20,
+                      paddingTop: 10,
+                      height: 'auto',
+                      paddingBottom: 10,
+                      borderColor: 'gray',
+                      borderWidth: 0.7,
+                      flexDirection: 'row',
+                    }}>
+                      <TextInput
+                        placeholderTextColor={Colors.fontColorSecondary}
+                        maxLength={13}
+                        keyboardType="number-pad"
+                        placeholder={Language.t('register.validationEmptyIdCard')}
+                        onChangeText={(val) => {
+                          setNewData({ ...newData, idCard: val });
+                        }}
+                        style={styles.textInput}></TextInput>
+                    </View>
 
                     <Text style={styles.textTitle}>
                       {Language.t('register.password')}
                     </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        padding: 2,
-                        alignItems: 'center',
-                      }}>
+                    <View style={{
+                      backgroundColor: Colors.backgroundColorSecondary,
+                      marginTop: 5,
+                      borderRadius: 10,
+                      paddingLeft: 20,
+                      paddingRight: 20,
+                      paddingTop: 10,
+                      height: 'auto',
+                      paddingBottom: 10,
+                      borderColor: 'gray',
+                      borderWidth: 0.7,
+                      flexDirection: 'row',
+                    }}>
                       <TextInput
                         style={styles.textInput}
                         secureTextEntry={data.secureTextEntry ? true : false}
                         placeholderTextColor={Colors.fontColorSecondary}
                         keyboardType="default"
-                        maxLength={8}
+
                         placeholder={Language.t('register.validationEmptyPassword')}
                         autoCapitalize="none"
                         onChangeText={(val) => {
@@ -475,12 +499,19 @@ const RegisterScreen = () => {
                     <Text style={styles.textTitle}>
                       {Language.t('register.confirmPassword')}
                     </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        padding: 2,
-                        alignItems: 'center',
-                      }}>
+                    <View style={{
+                      backgroundColor: Colors.backgroundColorSecondary,
+                      marginTop: 5,
+                      borderRadius: 10,
+                      paddingLeft: 20,
+                      paddingRight: 20,
+                      paddingTop: 10,
+                      height: 'auto',
+                      paddingBottom: 10,
+                      borderColor: 'gray',
+                      borderWidth: 0.7,
+                      flexDirection: 'row',
+                    }}>
                       <TextInput
                         style={styles.textInput}
                         secureTextEntry={data.secureTextEntry ? true : false}
@@ -491,7 +522,7 @@ const RegisterScreen = () => {
                           handlePasswordChange(val);
                           setRePass(val);
                         }}
-                        maxLength={8}
+
                         placeholder={Language.t(
                           'register.validationEmptyConfirmPassword',
                         )}
@@ -539,9 +570,17 @@ const RegisterScreen = () => {
                   </Text>
                   <View
                     style={{
+                      backgroundColor: Colors.backgroundColorSecondary,
+                      marginTop: 5,
+                      borderRadius: 10,
+                      paddingLeft: 20,
+                      paddingRight: 20,
+                      paddingTop: 10,
+                      height: 'auto',
+                      paddingBottom: 10,
+                      borderColor: 'gray',
+                      borderWidth: 0.7,
                       flexDirection: 'row',
-                      padding: 2,
-                      alignItems: 'center',
                     }}>
                     <TextInput
                       style={styles.textInput}
@@ -560,41 +599,64 @@ const RegisterScreen = () => {
                         }
                       }}
                     />
-                    {data3 ? (
+                    {newData.phoneNum.length == 10 ? (
                       <Icons
                         name="check-circle"
                         size={25}
                         color={Colors.buttonColorPrimary}></Icons>
                     ) : null}
+
                   </View>
+
                   <Text style={styles.textTitle}>
                     {Language.t('register.idCard')}
                   </Text>
-                  <TextInput
-                    placeholderTextColor={Colors.fontColorSecondary}
-                    maxLength={13}
-                    keyboardType="number-pad"
-                    placeholder={Language.t('register.validationEmptyIdCard')}
-                    onChangeText={(val) => {
-                      setNewData({ ...newData, idCard: val });
-                    }}
-                    style={styles.textInput}></TextInput>
+                  <View style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    marginTop: 5,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    height: 'auto',
+                    paddingBottom: 10,
+                    borderColor: 'gray',
+                    borderWidth: 0.7,
+                    flexDirection: 'row',
+                  }}>
+                    <TextInput
+                      placeholderTextColor={Colors.fontColorSecondary}
+                      maxLength={13}
+                      keyboardType="number-pad"
+                      placeholder={Language.t('register.validationEmptyIdCard')}
+                      onChangeText={(val) => {
+                        setNewData({ ...newData, idCard: val });
+                      }}
+                      style={styles.textInput}></TextInput>
+                  </View>
+
 
                   <Text style={styles.textTitle}>
                     {Language.t('register.password')}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      padding: 2,
-                      alignItems: 'center',
-                    }}>
+                  <View style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    marginTop: 5,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    height: 'auto',
+                    paddingBottom: 10,
+                    borderColor: 'gray',
+                    borderWidth: 0.7,
+                    flexDirection: 'row',
+                  }}>
                     <TextInput
                       style={styles.textInput}
                       secureTextEntry={data.secureTextEntry ? true : false}
                       placeholderTextColor={Colors.fontColorSecondary}
                       keyboardType="default"
-                      maxLength={8}
                       placeholder={Language.t('register.validationEmptyPassword')}
                       autoCapitalize="none"
                       onChangeText={(val) => {
@@ -622,12 +684,19 @@ const RegisterScreen = () => {
                   <Text style={styles.textTitle}>
                     {Language.t('register.confirmPassword')}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      padding: 2,
-                      alignItems: 'center',
-                    }}>
+                  <View style={{
+                    backgroundColor: Colors.backgroundColorSecondary,
+                    marginTop: 5,
+                    borderRadius: 10,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: 10,
+                    height: 'auto',
+                    paddingBottom: 10,
+                    borderColor: 'gray',
+                    borderWidth: 0.7,
+                    flexDirection: 'row',
+                  }}>
                     <TextInput
                       style={styles.textInput}
                       secureTextEntry={data.secureTextEntry ? true : false}
@@ -638,7 +707,6 @@ const RegisterScreen = () => {
                         handlePasswordChange(val);
                         setRePass(val);
                       }}
-                      maxLength={8}
                       placeholder={Language.t(
                         'register.validationEmptyConfirmPassword',
                       )}
@@ -663,6 +731,7 @@ const RegisterScreen = () => {
             </ScrollView>)}
         </View>
       </KeyboardAvoidingView>
+
       {loading && (
         <View
           style={{
@@ -727,13 +796,13 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 8,
-    borderColor: 'gray',
-    color: Colors.inputText,
-    marginTop: Platform.OS === 'ios' ? 10 : 5,
+
+    borderBottomColor: Colors.borderColor,
+    color: Colors.fontColor,
+    paddingVertical: 3,
     fontSize: FontSize.medium,
-    borderWidth: 0.7,
-    paddingVertical: Platform.OS === 'ios' ? 15 : undefined,
-    paddingHorizontal: Platform.OS === 'ios' ? 10 : undefined,
+    height: 'auto',
+    borderBottomWidth: 0.7,
   },
 });
 const mapStateToProps = (state) => {

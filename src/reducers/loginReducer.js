@@ -19,6 +19,7 @@ import {
   USERNAME_SER,
   PASSWORD_SER,
   PROJECT_ID,
+  ACTION_SET_LANGUAGE
 } from '../Constants';
 
 const initialState = {
@@ -35,7 +36,8 @@ const initialState = {
   index: '-1',
   ipAddress: [],
   isFingerprint: false,
-  isScreen: ''
+  isScreen: '',
+  language: 'th'
 }
 
 const loginReducer = (state = initialState, { type, payload }) => {
@@ -68,6 +70,8 @@ const loginReducer = (state = initialState, { type, payload }) => {
       return { ...state, isFingerprint: payload }
     case ACTION_SET_SCREEN:
       return { ...state, isScreen: payload }
+    case ACTION_SET_LANGUAGE:
+      return { ...state, language: payload }
     default:
       return state;
   }

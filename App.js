@@ -107,7 +107,6 @@ function LoginStackScreen() {
         component={SelectBase}
       />
       <LoginStack.Screen
-        options={{ title: Language.t('selectBase.scanQR'), headerLeft: '' }}
         options={{ headerShown: false }}
         name="ScanScreen"
         component={ScanScreen}
@@ -356,11 +355,8 @@ const App = () => {
   const userReducer = useSelector(({ userReducer }) => userReducer);
   const [userIndex, setUserIndex] = useStateIfMounted(loginReducer.index);
   useEffect(() => {
-    if (userIndex == '-1') {
-      changeLanguage('th');
-    } else {
-      changeLanguage(userReducer.userData[userIndex].language);
-    }
+    console.log('App > loginReducer.language> ',loginReducer.language)
+    changeLanguage(loginReducer.language)
   }, []);
   return (
     <Provider store={store}>

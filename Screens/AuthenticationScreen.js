@@ -40,7 +40,7 @@ const AuthenticationScreen = ({ route }) => {
   let otpPassword = '';
 
   const handlePin = (code) => {
-    console.log(otpPassword)
+    console.log(`handlePin >> ${otpPassword}`)
     dispatch(registerActions.pinCode(code));
     if (code == otpPassword) {
       if (navi.navi == 'PersonalInfoScreen') {
@@ -546,10 +546,10 @@ const AuthenticationScreen = ({ route }) => {
                   {
                     fontSize: FontSize.medium,
                     alignSelf: 'center',
-                    color: Colors.linkColor,
+                    color: Colors.fontColor2,
                     textDecorationLine: 'underline',
                   },
-                  { color: enableResend ? '#234DB7' : 'gray' },
+                 
                 ]}>
                 {Language.t('register.resendOtp')} ({countdown})
               </Text>
@@ -613,10 +613,11 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.backgroundLoginColor,
   },
   containerAvoidingView: {
     flex: 0.6,
-    backgroundColor: Colors.backgroundColor,
+   
   },
   textTitle: {
     marginBottom: 50,
