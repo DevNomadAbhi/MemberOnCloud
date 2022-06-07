@@ -3,34 +3,38 @@ import {
   Container,
   Header,
   Tab,
+  View,
+  ActivityIndicator,
   Tabs,
   ScrollableTab,
   Text,
   TabHeading,
 } from 'native-base';
-import {Dimensions} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {Language} from '../translations/I18n';
-import React, {useState, useEffect} from 'react';
+import { Dimensions } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { Language } from '../translations/I18n';
+import React, { useState, useEffect } from 'react';
 import * as RedeemActions from '../src/actions/redeemActions';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
+import { useStateIfMounted } from 'use-state-if-mounted';
 import RedeemPage from '../pages/RedeemPage';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-import {FontSize} from '../components/FontSizeHelper';
+import { FontSize } from '../components/FontSizeHelper';
 
 const RedeemTabStack = () => {
   const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
-  const userReducer = useSelector(({userReducer}) => userReducer);
-  const redeemReducer = useSelector(({redeemReducer}) => redeemReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
+  const userReducer = useSelector(({ userReducer }) => userReducer);
+  const [loading, setLoading] = useStateIfMounted(true);
+  const redeemReducer = useSelector(({ redeemReducer }) => redeemReducer);
   const dispatch = useDispatch();
   const [userIndex, setUserIndex] = useState(loginReducer.index);
 
   const fetchData = async () => {
     var arrayGuid = [];
 
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -52,7 +56,7 @@ const RedeemTabStack = () => {
         for (var i in responseData.SHOWPAGE) {
           arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
         }
-
+        setLoading(false)
         dispatch(RedeemActions.LOguid(arrayGuid));
         dispatch(RedeemActions.LOresult(responseData.SHOWPAGE));
       })
@@ -67,7 +71,7 @@ const RedeemTabStack = () => {
     let redeemGuid = [];
     var arrayName = [];
     for (let i in ra) {
-      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+      await fetch(databaseReducer.Data.urlser + '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -134,12 +138,13 @@ const RedeemTabStack = () => {
   }, []);
 
   return (
-    <Container style={{backgroundColor: 'white'}}>
+
+    <Container style={{ backgroundColor: 'white' }}>
       {redeemReducer.LOresult && (
         <Tabs
           renderTabBar={() => (
             <ScrollableTab
-              underlineStyle={{backgroundColor: 'white', height: 2}}
+              underlineStyle={{ backgroundColor: 'white', height: 2 }}
             />
           )}>
           {redeemReducer.pageGuid.map((obj, index) => {
@@ -147,10 +152,10 @@ const RedeemTabStack = () => {
               <Tab
                 key={obj.id + '' + obj.loName}
                 heading={
-                  <TabHeading style={{width: deviceWidth / 3 ,borderRightWidth:0.3}} >
+                  <TabHeading style={{ width: deviceWidth / 3, borderRightWidth: 0.3 }} >
                     <Text
                       style={{
-                        fontSize: FontSize.medium-3,
+                        fontSize: FontSize.medium - 3,
                         textAlign: 'center',
                       }}>
                       {obj.loName}
@@ -163,7 +168,32 @@ const RedeemTabStack = () => {
           })}
         </Tabs>
       )}
+      {loading && (
+        <View
+          style={{
+            width: deviceWidth,
+            height: deviceHeight - 50,
+            opacity: 0.5,
+            backgroundColor: 'gray',
+            alignSelf: 'center',
+            justifyContent: 'center',
+            alignContent: 'center',
+            position: 'absolute',
+          }}>
+          <ActivityIndicator
+            style={{
+              alignSelf: 'center',
+            }}
+            animating={loading}
+            size="large"
+            color="#0288D1"
+          />
+        </View>
+      )}
     </Container>
+
+
+
   );
 };
 const mapStateToProps = (state) => {

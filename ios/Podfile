@@ -22,6 +22,8 @@ target 'MemberOnCloud' do
 
   pod 'Permission-Camera', :path => "../node_modules/react-native-permissions/ios/Camera/Permission-Camera.podspec"
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
   target 'MemberOnCloudTests' do
     inherit! :complete
     # Pods for testing

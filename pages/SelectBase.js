@@ -19,7 +19,7 @@ import { Picker, } from 'native-base';
 import { useStateIfMounted } from 'use-state-if-mounted';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RNRestart from 'react-native-restart';
-
+import RNFetchBlob from 'rn-fetch-blob';
 import { connect } from 'react-redux';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import Colors from '../src/Colors';
@@ -296,8 +296,242 @@ const SelectBase = ({ route }) => {
 
   }
 
+  const _addGUID_proJ = async (guid) => {
+    await fetch(baseurl + '/ECommerce', {
+      method: 'POST',
+      body: JSON.stringify({
+        'BPAPUS-BPAPSV': loginReducer.serviceID,
+        'BPAPUS-LOGIN-GUID': guid,
+        'BPAPUS-FUNCTION': 'Ec000400',
+        'BPAPUS-PARAM': '',
+        'BPAPUS-FILTER': "AND SHWJH_CODE='MEMBER ON CLOUD'",
+        'BPAPUS-ORDERBY': '',
+        'BPAPUS-OFFSET': '0',
+        'BPAPUS-FETCH': '0'
+      }),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.ResponseCode == 200) {
+          let responseData = JSON.parse(json.ResponseData);
+          if (responseData.Ec000400.length>0) {
+            console.log(`new project ID >> ${responseData.Ec000400[0].SHWJH_GUID}`)
+            dispatch(loginActions.projectId(responseData.Ec000400[0].SHWJH_GUID))
+            _FetchDataProject(guid, responseData.Ec000400[0].SHWJH_GUID)
+            return true
+          } else {
+            Alert.alert(
+              Language.t('alert.errorTitle'),
+              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            return false
+          }
+        } else {
+          return false
+        }
+        
+
+      })
+      .catch((error) => {
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        console.log('checkIPAddress>>', error);
+        return false
+      });
+  };
+  const _FetchDataProject = async (guid, projectID) => {
+    await fetch(baseurl + '/ECommerce', {
+      method: 'POST',
+      body: JSON.stringify({
+        'BPAPUS-BPAPSV': loginReducer.serviceID,
+        'BPAPUS-LOGIN-GUID': guid,
+        'BPAPUS-FUNCTION': 'GetProject',
+        'BPAPUS-PARAM':
+          '{"SHWJ_GUID": "' +
+          projectID +
+          '","SHWJ_IMAGE": "N", "SHWL_IMAGE": "N"}',
+        'BPAPUS-FILTER': '',
+        'BPAPUS-ORDERBY': '',
+        'BPAPUS-OFFSET': '0',
+        'BPAPUS-FETCH': '0',
+      }),
+    })
+      .then((response) => response.json())
+      .then(async (json) => {
+        if (json.ResponseCode == 200) {
+          let tempArray = [];
+          let responseData = JSON.parse(json.ResponseData);
+
+          for (let i in responseData.SHOWLAYOUT) {
+            console.log(`  ${responseData.SHOWLAYOUT[i].SHWLH_CODE}`)
+            let newObj = {
+              SHWLH_CODE: responseData.SHOWLAYOUT[i].SHWLH_CODE,
+              name: responseData.SHOWLAYOUT[i].SHWLH_NAME,
+              ename: responseData.SHOWLAYOUT[i].SHWLH_E_NAME,
+              guid: responseData.SHOWLAYOUT[i].SHWLH_GUID,
+              img: 'file://' + (await fetchActivityImg(responseData.SHOWLAYOUT[i].SHWLH_GUID)),
+              explain: responseData.SHOWLAYOUT[i].SHWLH_EXPLAIN,
+            };
+            tempArray.push(newObj);
+          }
+          let sortTempLAYOUT = []
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("REDEEM_01") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("REDEEM_02") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("MYCARD") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CONTACT") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CONDION") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("NOTI") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CAMPAIGN") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("TNT") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("ABOUTCARD") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("ACTIVITY") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("SPLASH") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("BANNER") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("INSTRUCTION") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('V')
+          for (var i in sortTempLAYOUT) {
+            console.log(sortTempLAYOUT[i].SHWLH_CODE)
+          }
+
+          if (sortTempLAYOUT.length == 13) {
+            dispatch(loginActions.jsonResult(sortTempLAYOUT));
+            Alert.alert(
+              Language.t('alert.succeed'),
+              Language.t('selectBase.connect') + ' ' + basename + ' ' + Language.t('alert.succeed'), [{
+                text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
+                  navigation.replace('LoginScreen', {})
+                )
+              }]);
+          } else {
+            Alert.alert(
+              Language.t('alert.errorTitle'),
+              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+          }
+
+        } else {
+          Alert.alert(
+              Language.t('alert.errorTitle'),
+              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        }
+
+      })
+      .catch((error) => {
+
+        console.error('_FetchDataProject >> ' + error);
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+      })
+  }
+  const getsortTempLAYOUT = async (TempLAYOUT) => {
+    let sortTempLAYOUT = []
+    console.log(sortTempLAYOUT)
+    // TempLAYOUT.map((items, index) => console.log(items.SHWLH_CODE))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_REDEEM_01') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_REDEEM_02') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_MYCARD') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_CONTACT') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_CONDION') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_NOTI') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_CAMPAIGN') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_TNT') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_ABOUTCARD') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_ACTIVITY') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_SPLASH') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_BANNER') }).map((items) => console.log(items))
+    // await TempLAYOUT.filter((item) => { return (item.SHWLH_CODE == 'MB_LO_INSTRUCTION') }).map((items) => console.log(items))
+
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_REDEEM_01') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_REDEEM_02') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_MYCARD') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_CONTACT') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_CONDION') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_NOTI') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_CAMPAIGN') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_TNT') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_ABOUTCARD') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_ACTIVITY') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_SPLASH') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_BANNER') sortTempLAYOUT.push(item) })
+    await TempLAYOUT.map((item) => { if (item.SHWLH_CODE == 'MB_LO_INSTRUCTION') sortTempLAYOUT.push(item) })
+
+    return sortTempLAYOUT
+
+  }
 
 
+  const fetchActivityImg = async (url) => {
+    let imgbase64 = null;
+    await RNFetchBlob.config({ fileCache: true, appendExt: 'png' })
+      .fetch(
+        'GET',
+        'http://192.168.0.110:8906/Member/BplusErpDvSvrIIS.dll/DownloadFile',
+        {
+          'BPAPUS-BPAPSV': loginReducer.serviceID,
+          'BPAPUS-GUID': loginReducer.guid,
+          FilePath: 'ShowLayout',
+          FileName: url + '.png',
+        },
+      )
+      .then((res) => {
+        imgbase64 = res.path();
+      })
+      .catch((error) => {
+        console.error('fetchMenuImg: ' + error);
+      });
+    return imgbase64;
+  };
   const checkIPAddress = async (state) => {
     let tempurl = baseurl.split('.dll')
     let newurl = tempurl[0] + '.dll'
@@ -331,45 +565,43 @@ const SelectBase = ({ route }) => {
             }),
           })
             .then((response) => response.json())
-            .then((json) => {
+            .then(async(json) => {
               if (json && json.ResponseCode == '200') {
-                let newObj = {
-                  nameser: basename,
-                  urlser: newurl,
-                  usernameser: username,
-                  passwordser: password
-                }
-                console.log(json.ResponseCode)
-                if (state == '-1') {
-                  for (let i in loginReducer.ipAddress) {
-                    if (i == updateindex) {
-                      temp.push(newObj)
-                    } else {
-                      temp.push(loginReducer.ipAddress[i])
-                    }
+                let responseData = JSON.parse(json.ResponseData);
+           
+                  let newObj = {
+                    nameser: basename,
+                    urlser: newurl,
+                    usernameser: username,
+                    passwordser: password
                   }
-                  dispatch(loginActions.ipAddress(temp))
-                  dispatch(databaseActions.setData(newObj))
-                } else if (state == '1') {
-                  if (items.length > 0) {
-                    for (let i in items) {
-                      temp.push(items[i])
-                    }
-                  }
-                  temp.push(newObj)
-                  dispatch(loginActions.ipAddress(temp))
-                  dispatch(databaseActions.setData(newObj))
-                } else if (state == '0') {
-                  dispatch(databaseActions.setData(newObj))
-                }
+                  console.log(json.ResponseCode)
 
-                Alert.alert(
-                  Language.t('alert.succeed'),
-                  Language.t('selectBase.connect') + ' ' + basename + ' ' + Language.t('alert.succeed'), [{
-                    text: Language.t('alert.ok'), onPress: () => navigation.dispatch(
-                      navigation.replace('LoginScreen', {})
-                    )
-                  }]);
+                  if (state == '-1') {
+                    for (let i in loginReducer.ipAddress) {
+                      if (i == updateindex) {
+                        temp.push(newObj)
+                      } else {
+                        temp.push(loginReducer.ipAddress[i])
+                      }
+                    }
+                    dispatch(loginActions.ipAddress(temp))
+                    dispatch(databaseActions.setData(newObj))
+                  } else if (state == '1') {
+                    if (items.length > 0) {
+                      for (let i in items) {
+                        temp.push(items[i])
+                      }
+                    }
+                    temp.push(newObj)
+                    dispatch(loginActions.ipAddress(temp))
+                    dispatch(databaseActions.setData(newObj))
+                  } else if (state == '0') {
+                    dispatch(databaseActions.setData(newObj))
+                  }
+                  _addGUID_proJ(responseData.BPAPUS_GUID)
+                
+              
               } else {
                 console.log('Function Parameter Required');
                 let temp_error = 'error_ser.' + json.ResponseCode;
@@ -401,7 +633,7 @@ const SelectBase = ({ route }) => {
         Alert.alert(
           Language.t('alert.errorTitle'),
           Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-        console.log('checkIPAddress');
+        console.log('checkIPAddress>>', error);
         setLoading(false)
       });
 
@@ -410,8 +642,6 @@ const SelectBase = ({ route }) => {
 
   return (
     <View style={container1}>
-
-
       <View style={tabbar}>
         <View style={{ flexDirection: 'row', }}>
           <TouchableOpacity
@@ -458,7 +688,7 @@ const SelectBase = ({ route }) => {
                     selectedValue={selectbaseValue}
                     enabled={true}
                     mode="dropdown"
-                    state={{ color: Colors.backgroundLoginColor  }}
+                    state={{ color: Colors.backgroundLoginColor }}
                     onValueChange={(itemValue, itemIndex) => _onPressSelectbaseValue(itemValue)}>
                     {items.map((obj, index) => {
                       return (

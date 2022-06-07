@@ -20,12 +20,12 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { connect } from 'react-redux';
 import { useSelector, useDispatch } from 'react-redux';
-import  ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Language } from '../translations/I18n';
 import * as loginActions from '../src/actions/loginActions';
 import * as activityActions from '../src/actions/activityActions';
-import * as userActions from '../src/actions/userActions';  
+import * as userActions from '../src/actions/userActions';
 import Colors from '../src/Colors';
 const deviceWidth = Dimensions.get('screen').width;
 const deviceHeight = Dimensions.get('screen').height;
@@ -38,6 +38,7 @@ const HomeScreen = () => {
   const activityReducer = useSelector(({ activityReducer }) => activityReducer);
   const [selectedId, setSelectedId] = useStateIfMounted(null);
   const [bannerImg, setBannerImg] = useStateIfMounted('');
+  const [load_popUpImg, setload_PopUpImg] = useStateIfMounted(true);
   const [popUpImg, setPopUpImg] = useStateIfMounted([]);
   const [active, setActive] = useStateIfMounted(0);
   const [active2, setActive2] = useStateIfMounted(0);
@@ -68,7 +69,8 @@ const HomeScreen = () => {
     console.log('filePath > ', filePath)
   }, []);
   useEffect(() => {
-    stack();
+    stack1();
+    stack2();
   }, []);
   useEffect(() => {
     console.log(` `)
@@ -90,6 +92,7 @@ const HomeScreen = () => {
 
   const chooseFile = () => {
     let options = {
+      mediaType: 'photo',
       title: 'ตัวเลือกรูปภาพ',
       storageOptions: {
         skipBackup: true,
@@ -146,6 +149,7 @@ const HomeScreen = () => {
       .catch((error) => {
         console.error('fetchDataPopUpImg: ' + error);
       });
+
     return ra;
   };
 
@@ -289,13 +293,17 @@ const HomeScreen = () => {
     dispatch(activityActions.LOname(arrayResult));
   };
 
-  const stack = async () => {
-    let ra = await fetchDataPopUpImg();
-    setPopUpImg(ra);
+  const stack1 = async () => {
     let ra3 = await fetchActivityData();
     let ra4 = await fetchActivityPage(ra3);
     await stackMenuImg(ra4);
     await fetchBanner(loginReducer.jsonResult[11].guid);
+
+  };
+  const stack2 = async () => {
+
+    let ra = await fetchDataPopUpImg();
+    setPopUpImg(ra);
   };
 
   const fetchActivityPage = async (ra3) => {
@@ -346,7 +354,7 @@ const HomeScreen = () => {
   return (
     <View
       style={{ backgroundColor: '#E6EBFF', flex: 1, flexDirection: 'column' }}>
-      <StatusBar hidden={false} />
+      <StatusBar hidden={true} />
       <View
         style={{
           height: 70,
@@ -385,7 +393,7 @@ const HomeScreen = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('PersonalInfo')}>
               <Text style={{ fontSize: FontSize.medium }}>
-              {userReducer.userData[userIndex].firstName?userReducer.userData[userIndex].firstName.length>5?(userReducer.userData[userIndex].firstName.substring(0,5)+'..'):userReducer.userData[userIndex].firstName:Language.t('main.member')}
+                {userReducer.userData[userIndex].firstName ? userReducer.userData[userIndex].firstName.length > 5 ? (userReducer.userData[userIndex].firstName.substring(0, 5) + '..') : userReducer.userData[userIndex].firstName : Language.t('main.member')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -412,12 +420,11 @@ const HomeScreen = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('PersonalInfo')}>
               <Text style={{ marginLeft: 12, fontSize: FontSize.medium }}>
-                {userReducer.userData[userIndex].firstName?userReducer.userData[userIndex].firstName:Language.t('main.member')}
+                {userReducer.userData[userIndex].firstName ? userReducer.userData[userIndex].firstName : Language.t('main.member')}
               </Text>
             </TouchableOpacity>
           </View>
         )}
-
         <Image
           resizeMode="contain"
           source={require('../img/LogoBplusMember.png')}
@@ -438,13 +445,39 @@ const HomeScreen = () => {
             flexDirection: 'column',
             justifyContent: 'flex-start',
           }}>
-          <Image
-            resizeMode="contain"
-            source={{
-              uri: `data:image/png;base64,${bannerImg}`,
-            }}
-            style={{ width: undefined, height: 200 }}></Image>
+          {bannerImg ?
+            <Image
+              onLoadEnd={() => setload_PopUpImg(false)}
+              resizeMode="contain"
+              source={{
+                uri: `data:image/png;base64,${bannerImg}`,
+              }}
+              style={{ width: undefined, height: 200 }}>
+            </Image> : <View
+              style={{
+
+                height: 200,
+                width: deviceWidth,
+                alignSelf: 'center',
+                justifyContent: 'center',
+                alignContent: 'center',
+                backgroundColor: '#ffff',
+                opacity: 0.4,
+              }}>
+              <ActivityIndicator
+                style={{
+                  borderRadius: 15,
+                  alignSelf: 'center',
+                  width: 100,
+                  height: 100,
+                }}
+                animating={load_popUpImg}
+                size="large"
+                color={Colors.lightPrimiryColor}
+              />
+            </View>}
         </View>
+
 
         <View
           style={{
@@ -765,23 +798,43 @@ const HomeScreen = () => {
                   left: 12,
                 }}
               />
-              <FlatList
-                style={{ position: 'absolute' }}
-                horizontal={true}
-                pagingEnabled={true}
-                showsHorizontalScrollIndicator={false}
-                data={popUpImg}
-                onMomentumScrollEnd={({ nativeEvent }) => {
-                  const active = Math.round(
-                    nativeEvent.contentOffset.x /
-                    nativeEvent.layoutMeasurement.width,
-                  );
-                  setActive2(active);
-                }}
-                renderItem={renderItem2}
-                keyExtractor={(item) => item.id}
-                extraData={selectedId}
-              />
+              {!load_popUpImg ?
+                <FlatList
+                  style={{ position: 'absolute' }}
+                  horizontal={true}
+                  pagingEnabled={true}
+                  showsHorizontalScrollIndicator={false}
+                  data={popUpImg}
+                  onMomentumScrollEnd={({ nativeEvent }) => {
+                    const active = Math.round(
+                      nativeEvent.contentOffset.x /
+                      nativeEvent.layoutMeasurement.width,
+                    );
+                    setActive2(active);
+                  }}
+                  renderItem={renderItem2}
+                  keyExtractor={(item) => item.id}
+                  extraData={selectedId}
+                />
+                : <View
+                  style={{
+                    alignSelf: 'center',
+                    height: 340,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    position: 'absolute',
+                  }}>
+                  <ActivityIndicator
+                    style={{
+                      borderRadius: 15,
+                      width: 100,
+                      height: 100,
+                    }}
+                    animating={load_popUpImg}
+                    size="large"
+                    color={Colors.lightPrimiryColor}
+                  />
+                </View>}
             </View>
             <View
               style={{ flexDirection: 'row', marginHorizontal: 10, padding: 5 }}>
@@ -811,7 +864,7 @@ const HomeScreen = () => {
                 justifyContent: 'center',
               }} // this will layout our dots horizontally (row) instead of vertically (column)
             >
-              {popUpImg.length
+              {popUpImg
                 ? popUpImg.map((_, i) => {
                   return (
                     <Animated.View // we will animate the opacity of the dots so use Animated.View instead of View here
@@ -831,31 +884,7 @@ const HomeScreen = () => {
           </View>
         </View>
       ) : null}
-      {loading && (
-        <View
-          style={{
-            width: deviceWidth,
-            height: deviceHeight - 50,
-            opacity: 0.5,
-            backgroundColor: 'black',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            alignContent: 'center',
-            position: 'absolute',
-          }}>
-          <ActivityIndicator
-            style={{
-              borderRadius: 15,
-              width: 100,
-              height: 100,
-              alignSelf: 'center',
-            }}
-            animating={loading}
-            size="large"
-            color={Colors.lightPrimiryColor}
-          />
-        </View>
-      )}
+
     </View>
   );
 };

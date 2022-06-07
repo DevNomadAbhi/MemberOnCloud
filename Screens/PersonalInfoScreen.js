@@ -338,7 +338,7 @@ const PersonalInfoScreen = () => {
                 <View
                   style={{
                     marginLeft: 20,
-                    borderWidth: 0.5,
+                    borderBottomWidth: 0.5,
                     flex: 1,
                   }}>
                   <Picker
@@ -383,7 +383,7 @@ const PersonalInfoScreen = () => {
               ) : (
                 <View
                   style={{
-                    borderWidth: 0.7,
+                    borderBottomWidth: 0.7,
                     borderColor: 'gray',
                     flex: 1,
                   }}>
@@ -451,12 +451,15 @@ const PersonalInfoScreen = () => {
               style={styles.textInput}></TextInput>
 
             <Text style={styles.textTitle}>{Language.t('profile.gender')}</Text>
-            <Text style={styles.textInput}>{gender}</Text>
+            <Text style={styles.textunInput} >{gender}</Text>
 
             <Text style={styles.textTitle}>
               {Language.t('profile.birthday')}
             </Text>
+            <View  style={styles.textInput}>
             <DatePicker date={newData.birthDate} onChange={onChangeData} />
+            </View>
+           
             <Text style={styles.textTitle}>
               {Language.t('profile.address')}
               {Language.t('login.and')}
@@ -516,11 +519,12 @@ const PersonalInfoScreen = () => {
               style={styles.textInput}></TextInput>
 
             <Text
-              style={{ marginTop: 10, fontSize: FontSize.medium, padding: 5 }}>
+              style={{ marginTop: 20, fontSize: FontSize.medium, padding: 5,borderBottomWidth:1 }}>
               {Language.t('interested.header')}
             </Text>
           </>
         }
+
         showsHorizontalScrollIndicator={false}
         data={interestReducer.interestImg}
         renderItem={renderItem}
@@ -598,11 +602,34 @@ const styles = StyleSheet.create({
     height: window.height / 2,
   },
   textInput: {
+    backgroundColor: Colors.backgroundColorSecondary,
+    marginTop: 5,
+    borderRadius: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    height: 'auto',
+    paddingBottom: 10,
     borderColor: 'gray',
-    padding: Platform.OS === 'ios' ? 15 : 11,
     borderWidth: 0.7,
+    flexDirection: 'row',
+  },
+  textunInput: {
+    backgroundColor: Colors.backgroundColorSecondary,
+    marginTop: 5,
+    borderRadius: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    height: 'auto',
+    paddingBottom: 10,
+    borderColor: 'gray',
+    borderWidth: 0.7,
+    flexDirection: 'row',
+    color: Colors.borderColor
   },
   textTitle: {
+    marginTop:5,
     fontSize: FontSize.medium,
     padding: 5,
   },

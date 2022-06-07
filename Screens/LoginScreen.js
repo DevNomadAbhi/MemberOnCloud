@@ -22,7 +22,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DeviceInfo from 'react-native-device-info';
 import { NetworkInfo } from "react-native-network-info";
 
-import RNFetchBlob from 'rn-fetch-blob';
+
 import { useStateIfMounted } from 'use-state-if-mounted';
 import * as TouchId from '../components/TouchId';
 import { connect } from 'react-redux';
@@ -38,7 +38,7 @@ import * as registerActions from '../src/actions/registerActions';
 import { TERM_CONDITION } from '../src/Constants';
 import { Language, changeLanguage } from '../translations/I18n';
 import Colors from '../src/Colors';
-
+import RNFetchBlob from 'rn-fetch-blob';
 import { fetchTsMember } from '../components/fetchTsMember';
 import { FontSize } from '../components/FontSizeHelper';
 const deviceWidth = Dimensions.get('window').width;
@@ -109,12 +109,19 @@ const LoginScreen = ({ route }) => {
 
   useEffect(() => {
     console.log(loginReducer.language)
+
     letsLoading()
+
     _Checkstate()
     return () => {
       isLogin;
     }
   }, [])
+  useEffect(() => {
+
+
+  }, [])
+
 
   const getMac = async () => {
     var lodstr = ''
@@ -139,6 +146,8 @@ const LoginScreen = ({ route }) => {
     console.log(`userloggedIn >> ${loginReducer.userloggedIn}`)
     console.log(`userName >> ${loginReducer.userName}`)
     console.log(`password >> ${loginReducer.password}`)
+    console.log(loginReducer.jsonResult)
+
     if (loginReducer.userloggedIn == true) {
       await _onPressLogin(loginReducer.userName, loginReducer.password)
     } else {
@@ -304,6 +313,7 @@ const LoginScreen = ({ route }) => {
                 } else if (json.ResponseCode == '200') {
                   let responseData = JSON.parse(json.ResponseData);
                   let MB_LOGIN_GUID = responseData.MB_LOGIN_GUID;
+
                   _onPressRegis(MB_LOGIN_GUID, GUID);
                 } else {
                   console.log(json.ReasonString);
@@ -323,7 +333,6 @@ const LoginScreen = ({ route }) => {
                 console.log('ERROR FETCH LoginByMobile : ' + error)
                 setLoading(false)
               }
-
               );
             c = false;
             break;
@@ -337,7 +346,55 @@ const LoginScreen = ({ route }) => {
         }
       });
   };
+  const _addGUID_proJ = async (c, guid) => {
+    console.log(guid)
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
+      method: 'POST',
+      body: JSON.stringify({
+        'BPAPUS-BPAPSV': loginReducer.serviceID,
+        'BPAPUS-LOGIN-GUID': guid,
+        'BPAPUS-FUNCTION': 'Ec000400',
+        'BPAPUS-PARAM': '',
+        'BPAPUS-FILTER': "AND SHWJH_CODE='MEMBER ON CLOUD'",
+        'BPAPUS-ORDERBY': '',
+        'BPAPUS-OFFSET': '0',
+        'BPAPUS-FETCH': '0'
+      }),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.ResponseCode == 200) {
+          let responseData = JSON.parse(json.ResponseData);
+          if (responseData.Ec000400[0].SHWJH_GUID) {
+            console.log(`new project ID >> ${responseData.Ec000400[0].SHWJH_GUID}`)
+            _FetchDataProject(c, guid, responseData.Ec000400[0].SHWJH_GUID)
+            dispatch(loginActions.projectId(responseData.Ec000400[0].SHWJH_GUID))
 
+          } else {
+            Alert.alert(
+              Language.t('alert.errorTitle'),
+              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            setuLogin(false)
+            closeLoading()
+          }
+        } else {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+          setuLogin(false)
+          closeLoading()
+        }
+      })
+      .catch((error) => {
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        console.log('checkIPAddress', error);
+        setuLogin(false)
+        closeLoading()
+
+      });
+  };
   const _onPressRegis = async (MB_LOGIN_GUID, GUID) => {
     console.log(`_onPressRegis`)
 
@@ -356,7 +413,7 @@ const LoginScreen = ({ route }) => {
       }),
     })
       .then((response) => response.json())
-      .then((json) => {
+      .then(async (json) => {
         let responseData2 = JSON.parse(json.ResponseData);
         console.log('responseData2 ### ' + responseData2);
         if (json.ResponseCode == '200') {
@@ -400,25 +457,34 @@ const LoginScreen = ({ route }) => {
           if (temp.length == 0) {
             temp.push(newUser);
             dispatch(userActions.setUserData(temp));
+
             Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+
             navigation.dispatch(
               navigation.replace(navi.navi)
             )
             navigation.navigate(navi.navi);
+
+
           } else {
+
             for (let i in temp) {
               /* old user*/
               if (newUser.card == temp[i].card) {
+
                 temp[i] = newUser;
                 Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
                 navigation.navigate(navi.navi);
                 return;
+
               }
             }
+
             temp.push(newUser);
             dispatch(userActions.setUserData(temp));
             Alert.alert('', Language.t('register.alertRegisterSuccess'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
             navigation.navigate(navi.navi);
+
           }
         }
         setLoading(false)
@@ -440,6 +506,7 @@ const LoginScreen = ({ route }) => {
   }
 
   const _fetchGuidLogin = async (username, password) => {
+    let BPAPUS_GUID
     await fetch(databaseReducer.Data.urlser + '/DevUsers', {
       method: 'POST',
       body: JSON.stringify({
@@ -464,16 +531,21 @@ const LoginScreen = ({ route }) => {
         dispatch(loginActions.guid(responseData.BPAPUS_GUID));
         dispatch(loginActions.userName(username));
         dispatch(loginActions.password(password));
+        dispatch(loginActions.userlogin(true));
+        BPAPUS_GUID = responseData.BPAPUS_GUID
         setGUID(responseData.BPAPUS_GUID);
+
       })
       .catch((error) => {
         console.error('_fetchGuidLogin ' + error);
       });
 
     let GUIDResult = '';
+
     setGUID((item) => {
       GUIDResult = item;
     });
+
     let count = false;
     let temp = userReducer.userData;
     for (let i in userReducer.userData) {
@@ -519,7 +591,7 @@ const LoginScreen = ({ route }) => {
             (temp[i].CNTTPT = xresult.MB_CNTTPT),
             dispatch(userActions.setUserData(temp));
 
-          await _FetchDataProject(GUIDResult, true);
+          await _FetchNav(true, BPAPUS_GUID);
           count = true;
           break;
 
@@ -536,7 +608,7 @@ const LoginScreen = ({ route }) => {
         dispatch(loginActions.index(i));
         temp[i].loggedIn = true;
         dispatch(userActions.setUserData(temp));
-        await _FetchDataProject(GUIDResult, false);
+        await _FetchNav(false, BPAPUS_GUID);
         count = true;
         break;
       }
@@ -544,8 +616,6 @@ const LoginScreen = ({ route }) => {
     }
 
     if (count == false) {
-
-     
       closeLoading();
       dispatch(loginActions.userName(''));
       dispatch(loginActions.password(''));
@@ -558,16 +628,25 @@ const LoginScreen = ({ route }) => {
     }
   };
 
-  const _FetchDataProject = async (GUIDResult, c) => {
-    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
+  const _FetchNav = async (c, GUID) => {
+    console.log(`_FetchNav`)
+    await _addGUID_proJ(c, GUID)
+
+
+
+
+
+  }
+  const _FetchDataProject = async (c, guid, projectID) => {
+    await fetch(databaseReducer.Data.urlser  + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
-        'BPAPUS-LOGIN-GUID': GUIDResult,
+        'BPAPUS-LOGIN-GUID': guid,
         'BPAPUS-FUNCTION': 'GetProject',
         'BPAPUS-PARAM':
           '{"SHWJ_GUID": "' +
-          loginReducer.projectID +
+          projectID +
           '","SHWJ_IMAGE": "N", "SHWL_IMAGE": "N"}',
         'BPAPUS-FILTER': '',
         'BPAPUS-ORDERBY': '',
@@ -577,43 +656,158 @@ const LoginScreen = ({ route }) => {
     })
       .then((response) => response.json())
       .then(async (json) => {
-        let tempArray = [];
-        let responseData = JSON.parse(json.ResponseData);
-        // console.log(JSON.stringify(responseData));
-        for (let i in responseData.SHOWLAYOUT) {
-          let newObj = {
-            name: responseData.SHOWLAYOUT[i].SHWLH_NAME,
-            ename: responseData.SHOWLAYOUT[i].SHWLH_E_NAME,
-            guid: responseData.SHOWLAYOUT[i].SHWLH_GUID,
-            img: 'file://' + (await fetchActivityImg(responseData.SHOWLAYOUT[i].SHWLH_GUID)),
-            explain: responseData.SHOWLAYOUT[i].SHWLH_EXPLAIN,
-          };
-          tempArray.push(newObj);
+        if (json.ResponseCode == 200) {
+          let tempArray = [];
+          let responseData = JSON.parse(json.ResponseData);
+
+          for (let i in responseData.SHOWLAYOUT) {
+            console.log(`  ${responseData.SHOWLAYOUT[i].SHWLH_CODE}`)
+            let newObj = {
+              SHWLH_CODE: responseData.SHOWLAYOUT[i].SHWLH_CODE,
+              name: responseData.SHOWLAYOUT[i].SHWLH_NAME,
+              ename: responseData.SHOWLAYOUT[i].SHWLH_E_NAME,
+              guid: responseData.SHOWLAYOUT[i].SHWLH_GUID,
+              img: 'file://' + (await fetchActivityImg(responseData.SHOWLAYOUT[i].SHWLH_GUID)),
+              explain: responseData.SHOWLAYOUT[i].SHWLH_EXPLAIN,
+            };
+            tempArray.push(newObj);
+          }
+          let sortTempLAYOUT = []
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("REDEEM_01") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("REDEEM_02") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("MYCARD") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CONTACT") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CONDION") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("NOTI") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("CAMPAIGN") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("TNT") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("ABOUTCARD") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("ACTIVITY") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("SPLASH") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("BANNER") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('..')
+          await tempArray.map(async (item) => {
+            if (item.SHWLH_CODE.search("INSTRUCTION") > -1)
+              await sortTempLAYOUT.push(item)
+          })
+          console.log('V')
+          for (var i in sortTempLAYOUT) {
+            console.log(sortTempLAYOUT[i].SHWLH_CODE)
+          }
+
+          if (sortTempLAYOUT.length == 13) {
+            dispatch(loginActions.jsonResult(sortTempLAYOUT));
+            if (c == true) {
+              if (tempUser[userIndex].interestImg.length > 0)
+                navigation.dispatch(
+                  navigation.replace('BottomTabs'))
+              else
+                navigation.dispatch(
+                  navigation.replace('InterestScreen'))
+            } else if (c == false) navigation.dispatch(
+              navigation.replace('InterestScreen')
+            );
+            else {
+              Alert.alert(
+                Language.t('alert.errorTitle'),
+                "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+              setuLogin(false)
+              closeLoading()
+            }
+          } else {
+            Alert.alert(
+              Language.t('alert.errorTitle'),
+              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            setuLogin(false)
+            closeLoading()
+          }
+
+        } else {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+          setuLogin(false)
+          closeLoading()
         }
 
-        dispatch(loginActions.jsonResult(tempArray));
-
-        closeLoading();
-        if (c == true) {
-        
-          if (tempUser[userIndex].interestImg.length > 0)
-            navigation.dispatch(
-              navigation.replace('BottomTabs')
-            )
-          else
-            navigation.dispatch(
-              navigation.replace('InterestScreen')
-            )
-        } else if (c == false) navigation.dispatch(
-          navigation.replace('InterestScreen')
-        );
-        else console.log('ERROR SOMETHING AT FETCH_DATAPROJECT');
       })
       .catch((error) => {
+
         console.error('_FetchDataProject >> ' + error);
+        Alert.alert(
+          Language.t('alert.errorTitle'),
+          "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        setuLogin(false)
+        closeLoading()
       })
   }
 
+  const fingerPrint = () => {
+    let index = loginReducer.index;
+    TouchId._pressHandler().then((x) => {
+      if (x) {
+        _onPressLogin(
+          userReducer.userData[index].phoneNum,
+          userReducer.userData[index].password,
+        );
+      } else {
+        setShowFingerprint(x);
+      }
+    });
+  };
+  const _onPressGo = () => {
+    setIsLogin(true);
+    dispatch(loginActions.login(true));
+    closeLoading();
+    navigation.navigate('SelectScreen');
+  };
   const fetchActivityImg = async (url) => {
     let imgbase64 = null;
     await RNFetchBlob.config({ fileCache: true, appendExt: 'png' })
@@ -635,29 +829,9 @@ const LoginScreen = ({ route }) => {
       });
     return imgbase64;
   };
-  const fingerPrint = () => {
-    let index = loginReducer.index;
-    TouchId._pressHandler().then((x) => {
-      if (x) {
-        _onPressLogin(
-          userReducer.userData[index].phoneNum,
-          userReducer.userData[index].password,
-        );
-      } else {
-        setShowFingerprint(x);
-      }
-    });
-  };
-  const _onPressGo = () => {
-    setIsLogin(true);
-    dispatch(loginActions.login(true));
-    closeLoading();
-    navigation.navigate('SelectScreen');
-  };
-
   return (
     <>
-      {loginReducer.userloggedIn == true || loading ? (
+      {uLogin == true || loading ? (
         <>
           <SafeAreaView style={container1}>
             <StatusBar hidden={true} />
