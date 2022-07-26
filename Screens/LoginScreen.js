@@ -94,33 +94,35 @@ const LoginScreen = ({ route }) => {
     setLoading(true);
   }
 
-  useEffect(() => {
-    if (registerReducer.machineNum.length == 0)
-      getMac()
-  }, [])
 
-  useEffect(() => {
-    if (route.params?.language) {
-      changeLanguage(route.params.language)
-      dispatch(loginActions.setLanguage(itemValue))
-    }
 
-  }, [route.params?.language])
+
 
   useEffect(() => {
     console.log(loginReducer.language)
-
+    console.log(`getLang => ${loginReducer.language}`)
     letsLoading()
 
+    registerReducer.machineNum.length == 0 && getMac()
+
+    if (route.params?.language) {
+      changeLanguage(route.params.language)
+      dispatch(loginActions.setLanguage(itemValue))
+    } else {
+      changeLanguage(loginReducer.language)
+    }
+    for (var i in userReducer.userData) {
+      console.log('username > ', userReducer.userData[i].phoneNum)
+      console.log('password > ', userReducer.userData[i].password)
+      console.log()
+    }
     _Checkstate()
     return () => {
       isLogin;
     }
-  }, [])
-  useEffect(() => {
-
 
   }, [])
+
 
 
   const getMac = async () => {
@@ -146,11 +148,12 @@ const LoginScreen = ({ route }) => {
     console.log(`userloggedIn >> ${loginReducer.userloggedIn}`)
     console.log(`userName >> ${loginReducer.userName}`)
     console.log(`password >> ${loginReducer.password}`)
-    console.log(loginReducer.jsonResult)
 
-    if (loginReducer.userloggedIn == true) {
+
+    if (userIndex && tempUser[userIndex] && tempUser[userIndex].interestImg.length > 0 && loginReducer.userloggedIn == true) {
       await _onPressLogin(loginReducer.userName, loginReducer.password)
     } else {
+      setuLogin(false)
       closeLoading()
     }
 
@@ -266,85 +269,57 @@ const LoginScreen = ({ route }) => {
 
   const fetchUserData = async (GUID, username) => {
     console.log('FETCH /LookupErp');
-    await fetch(databaseReducer.Data.urlser + '/LookupErp', {
+
+    await fetch(databaseReducer.Data.urlser + '/MbUsers', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
         'BPAPUS-LOGIN-GUID': GUID,
-        'BPAPUS-FUNCTION': 'Mb000130',
-        'BPAPUS-PARAM': '',
-        'BPAPUS-FILTER': '',
-        'BPAPUS-ORDERBY': '',
-        'BPAPUS-OFFSET': '0',
-        'BPAPUS-FETCH': '0',
+        'BPAPUS-FUNCTION': 'LoginByMobile',
+        'BPAPUS-PARAM':
+          '{"MB_CNTRY_CODE": "66","MB_REG_MOBILE": "' +
+          username +
+          '",    "MB_PW": "' +
+          '1234' +
+          '"}',
       }),
     })
       .then((response) => response.json())
       .then(async (json) => {
-        let responseData = JSON.parse(json.ResponseData);
-        let c = false;
-        for (let i in responseData.Mb000130) {
-          if (
-            responseData.Mb000130[i].MB_PHONE == username
-          ) {
-            console.log('FETCH /MbUsers');
-            await fetch(databaseReducer.Data.urlser + '/MbUsers', {
-              method: 'POST',
-              body: JSON.stringify({
-                'BPAPUS-BPAPSV': loginReducer.serviceID,
-                'BPAPUS-LOGIN-GUID': GUID,
-                'BPAPUS-FUNCTION': 'LoginByMobile',
-                'BPAPUS-PARAM':
-                  '{"MB_CNTRY_CODE": "66",    "MB_REG_MOBILE": "' +
-                  username +
-                  '",    "MB_PW": "' +
-                  '1234' +
-                  '"}',
-              }),
-            })
-              .then((response) => response.json())
-              .then(async (json) => {
-                if (json.ResponseCode == '635') {
-                  console.log('NOT FOUND MEMBER');
-                  Alert.alert('', Language.t('login.errorNotfoundUsername'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                  //_fetchNewMember(GUID);
-                } else if (json.ResponseCode == '629') {
-                  console.log('Function Parameter Required');
-                } else if (json.ResponseCode == '200') {
-                  let responseData = JSON.parse(json.ResponseData);
-                  let MB_LOGIN_GUID = responseData.MB_LOGIN_GUID;
+        if (json.ResponseCode == '635') {
+          console.log('NOT FOUND MEMBER');
+          Alert.alert('', Language.t('login.errorNotfoundUsername'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+          //_fetchNewMember(GUID);
+        } else if (json.ResponseCode == '629') {
+          console.log('Function Parameter Required');
+        } else if (json.ResponseCode == '200') {
+          let responseData = JSON.parse(json.ResponseData);
+          let MB_LOGIN_GUID = responseData.MB_LOGIN_GUID;
 
-                  _onPressRegis(MB_LOGIN_GUID, GUID);
-                } else {
-                  console.log(json.ReasonString);
-                }
-                setLoading(false)
-              })
-              .catch((error) => {
-                if (databaseReducer.Data.urlser == '') {
-                  Alert.alert(
-                    Language.t('alert.errorTitle'),
-                    Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                } else {
-                  Alert.alert(
-                    Language.t('alert.errorTitle'),
-                    Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-                }
-                console.log('ERROR FETCH LoginByMobile : ' + error)
-                setLoading(false)
-              }
-              );
-            c = false;
-            break;
-          } else {
-            c = true;
-          }
+          _onPressRegis(MB_LOGIN_GUID, GUID);
+        } else {
+          console.log(json.ReasonString);
         }
-        if (c) {
+        setLoading(false)
+      })
+      .catch((error) => {
+        if (databaseReducer.Data.urlser == '') {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        } else {
+          Alert.alert(
+            Language.t('alert.errorTitle'),
+            Language.t('alert.internetError'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+        }
+        console.log('ERROR FETCH LoginByMobile : ' + error)
+        setLoading(false)
+      }
+      );
 
-          setLoading(false)
-        }
-      });
+
+
+
   };
   const _addGUID_proJ = async (c, guid) => {
     console.log(guid)
@@ -638,7 +613,7 @@ const LoginScreen = ({ route }) => {
 
   }
   const _FetchDataProject = async (c, guid, projectID) => {
-    await fetch(databaseReducer.Data.urlser  + '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -745,12 +720,13 @@ const LoginScreen = ({ route }) => {
           if (sortTempLAYOUT.length == 13) {
             dispatch(loginActions.jsonResult(sortTempLAYOUT));
             if (c == true) {
-              if (tempUser[userIndex].interestImg.length > 0)
+              if (userIndex && tempUser[userIndex] && tempUser[userIndex].interestImg.length > 0)
                 navigation.dispatch(
                   navigation.replace('BottomTabs'))
               else
                 navigation.dispatch(
-                  navigation.replace('InterestScreen'))
+                  navigation.replace('InterestScreen')
+                );
             } else if (c == false) navigation.dispatch(
               navigation.replace('InterestScreen')
             );
@@ -1042,12 +1018,23 @@ const LoginScreen = ({ route }) => {
                 </TouchableNativeFeedback>
               </View>
 
+
             </KeyboardAvoidingView>
 
           </ScrollView>
 
           {showFingerprint ? fingerPrint() : null}
+          <View style={{ position: 'absolute', marginTop: deviceHeight * 0.95, alignSelf: 'flex-end', paddingRight: 10 }}>
+            <Text
+              style={{
+                color: Colors.buttonColorPrimary,
+                fontSize: FontSize.medium,
 
+
+              }}>
+              {'version 1.0.3'}
+            </Text>
+          </View>
           {isLogin ? null : (
             <View style={container2}>
               <ScrollView>

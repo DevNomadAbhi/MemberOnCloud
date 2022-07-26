@@ -41,8 +41,10 @@ const AuthenticationScreen = ({ route }) => {
 
   const handlePin = (code) => {
     console.log(`handlePin >> ${otpPassword}`)
+    console.log(navi.navi)
     dispatch(registerActions.pinCode(code));
     if (code == otpPassword) {
+    
       if (navi.navi == 'PersonalInfoScreen') {
         Alert.alert(Language.t('profile.headerPersonalInformation'),
           Language.t('profile.alert'), [{
@@ -56,8 +58,9 @@ const AuthenticationScreen = ({ route }) => {
         dispatch(registerActions.pinCode(''));
       } else if (navi.navi == 'Menu') {
         Alert.alert('', Language.t('register.confirmRegistration'), [{ text: Language.t('alert.ok'), onPress: () => dispatch(registerActions.pinCode('')) }]);
-        let tempUser = navi.tempUser
-        fetch(databaseReducer.Data.urlser+ '/MbUsers', {
+        tempUser = navi.tempUser
+        console.log(tempUser)
+        fetch(databaseReducer.Data.urlser + '/MbUsers', {
           method: 'POST',
           body: JSON.stringify({
             'BPAPUS-BPAPSV': Constants.SERVICE_ID,
@@ -77,7 +80,7 @@ const AuthenticationScreen = ({ route }) => {
             let NEW_GUID = responseData.MB_LOGIN_GUID;
 
             console.log(NEW_GUID)
-            fetch(databaseReducer.Data.urlser+ '/MbUsers', {
+            fetch(databaseReducer.Data.urlser + '/MbUsers', {
               method: 'POST',
               body: JSON.stringify({
                 'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -116,7 +119,7 @@ const AuthenticationScreen = ({ route }) => {
               .then((response) => response.json())
               .then(async (json) => {
                 if (json && json.ResponseCode == '200') {
-                 await dispatch(userActions.setUserData(tempUser));
+                  await dispatch(userActions.setUserData(tempUser));
                   RNRestart.Restart();
                 } else {
                   console.log('ERROR : ' + json.ReasonString);
@@ -162,7 +165,7 @@ const AuthenticationScreen = ({ route }) => {
           Alert.alert('', Language.t('register.confirmRegistration'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
           dispatch(registerActions.pinCode(''));
           let tempUser = navi.tempUser
-          fetch(databaseReducer.Data.urlser+ '/MbUsers', {
+          fetch(databaseReducer.Data.urlser + '/MbUsers', {
             method: 'POST',
             body: JSON.stringify({
               'BPAPUS-BPAPSV': Constants.SERVICE_ID,
@@ -181,7 +184,7 @@ const AuthenticationScreen = ({ route }) => {
               let responseData = JSON.parse(json.ResponseData);
               let NEW_GUID = responseData.MB_LOGIN_GUID;
 
-              fetch(databaseReducer.Data.urlser+ '/MbUsers', {
+              fetch(databaseReducer.Data.urlser + '/MbUsers', {
                 method: 'POST',
                 body: JSON.stringify({
                   'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -273,7 +276,7 @@ const AuthenticationScreen = ({ route }) => {
     let GUID = navi.GUID;
     console.log("MB_LOGIN_GUID : " + MB_LOGIN_GUID)
     console.log("GUID : " + GUID)
-    await fetch(databaseReducer.Data.urlser+ '/Member', {
+    await fetch(databaseReducer.Data.urlser + '/Member', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': Constants.SERVICE_ID,
@@ -311,7 +314,7 @@ const AuthenticationScreen = ({ route }) => {
             ADDR_2: xresult.MB_ADDR_2,
             ADDR_3: xresult.MB_ADDR_3,
             postCode: xresult.MB_POST,
-            phoneNum: xresult.MB_PHONE,
+            phoneNum: navi.newData.phoneNum,
             email: xresult.MB_EMAIL,
             password: navi.newData.password,
             type: xresult.MT_NAME,
@@ -363,16 +366,17 @@ const AuthenticationScreen = ({ route }) => {
       })
       .catch((error) => {
         console.log('ERROR FETCH ShowMemberInfo: ' + error);
-        if (databaseReducer.Data.urlser== '') {
+        if (databaseReducer.Data.urlser == '') {
           Alert.alert(
             Language.t('alert.errorTitle'),
             Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-        }  
+        }
 
       });
     //New user
   }
   const otpRequest = async () => {
+    setCountdown(defaultCountDown)
     otpPassword = Math.floor(1000 + Math.random() * 9000)
     setOTPpassword(otpPassword);
 
@@ -383,6 +387,7 @@ const AuthenticationScreen = ({ route }) => {
 
     if (navi.newData) {
       let phoneNum = navi.newData.phoneNum
+      console.log(`phoneNum ${phoneNum}`)
       await fetch(Constants.API_ENDPOINT + 'RegisterNotify', {
         method: 'POST',
         headers: JSON.stringify({
@@ -410,11 +415,11 @@ const AuthenticationScreen = ({ route }) => {
         })
         .catch((error) => {
           console.log('ERROR otpRequest :' + error);
-          if (databaseReducer.Data.urlser== '') {
+          if (databaseReducer.Data.urlser == '') {
             Alert.alert(
               Language.t('alert.errorTitle'),
               Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => setCountdown(0) }]);
-          }  
+          }
         });
     } else {
       await fetch(Constants.API_ENDPOINT + 'RegisterNotify', {
@@ -447,11 +452,11 @@ const AuthenticationScreen = ({ route }) => {
         })
         .catch((error) => {
           console.log('ERROR otpRequest :' + error);
-          if (databaseReducer.Data.urlser== '') {
+          if (databaseReducer.Data.urlser == '') {
             Alert.alert(
               Language.t('alert.errorTitle'),
               Language.t('selectBase.error'), [{ text: Language.t('alert.ok'), onPress: () => setCountdown(0) }]);
-          }  
+          }
         });
     }
   };
@@ -460,7 +465,12 @@ const AuthenticationScreen = ({ route }) => {
     if (countdown === 0) {
       setEnableResend(true);
       setCountdown(0);
+      setOTPpassword(null);
+
       clearInterval(clockCall);
+      Alert.alert(
+        Language.t('alert.errorTitle'),
+        Language.t('register.OTPexpired'), [{ text: Language.t('alert.ok'), onPress: () => otpRequest() }]);
     } else {
       setCountdown(countdown - 1);
     }
@@ -549,7 +559,7 @@ const AuthenticationScreen = ({ route }) => {
                     color: Colors.fontColor2,
                     textDecorationLine: 'underline',
                   },
-                 
+
                 ]}>
                 {Language.t('register.resendOtp')} ({countdown})
               </Text>
@@ -617,7 +627,7 @@ const styles = StyleSheet.create({
   },
   containerAvoidingView: {
     flex: 0.6,
-   
+
   },
   textTitle: {
     marginBottom: 50,

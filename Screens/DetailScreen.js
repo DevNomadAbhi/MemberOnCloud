@@ -168,7 +168,7 @@ const DetailScreen = ({ route }) => {
             <Text>{Language.t('changeLanguage.header')}</Text>
             {Language.getLang() === 'th' ? (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: 15,color:Colors.fontColor2 }}>ภาษาไทย</Text>
+                <Text style={{ marginRight: 15,color:Colors.fontColor }}>ภาษาไทย</Text>
                 <FontAwesome
                   name="arrow-right"
                   size={Platform.OS === 'ios' ? 10 : 15}

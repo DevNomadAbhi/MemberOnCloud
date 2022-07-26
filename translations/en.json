@@ -45,6 +45,7 @@
     "alertNextInterested": "Tell us which area you are interested in. Specify at least 1 category so we can find the best promotion for you.",
     "confirmRegistration": "Confirm registration",
     "informOtp": "The system will inform the OTP via SMS of mobile number",
+    "OTPexpired": "OTP expired, press OK to receive OTP again",
     "mobilePhoneNumber": "Mobile number",
     "resendOtp": "Resend the OTP again"
   },
@@ -219,5 +220,16 @@
     "back": "Back",
     "next": "Next",
     "select": " Please Select"
+  },
+  "error_ser": {
+    "607": "Machine Over Limit",
+    "608": "Un Register Machine",
+    "609": "User ID Not Found Or Wrong",
+    "500": "Internal Server Error",
+    "605": "Invalid Service ID",
+    "610": "Not Login",
+    "614": "Table Name Not Found",
+    "617": "No License Or License Expire",
+    "629": "Function Parameter Required "
   }
 }

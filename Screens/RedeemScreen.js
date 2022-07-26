@@ -51,14 +51,15 @@ const RedeemTabStack = () => {
       }),
     })
       .then((response) => response.json())
-      .then((json) => {
+      .then(async (json) => {
         let responseData = JSON.parse(json.ResponseData);
         for (var i in responseData.SHOWPAGE) {
           arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
         }
-        setLoading(false)
-        dispatch(RedeemActions.LOguid(arrayGuid));
-        dispatch(RedeemActions.LOresult(responseData.SHOWPAGE));
+
+        await dispatch(RedeemActions.LOguid(arrayGuid));
+        await dispatch(RedeemActions.LOresult(responseData.SHOWPAGE));
+        await setLoading(false)
       })
       .catch((error) => {
         console.error(error);
@@ -128,9 +129,12 @@ const RedeemTabStack = () => {
     return redeemGuid;
   };
   const wow = async () => {
+
     let ra = await fetchData();
     let x = await fetchAPI(ra);
-    dispatch(RedeemActions.PageGuid(x));
+    await dispatch(RedeemActions.PageGuid(x));
+    console.log('/n/n/n/nLOresult', redeemReducer.LOresult)
+
   };
 
   useEffect(() => {
@@ -138,61 +142,55 @@ const RedeemTabStack = () => {
   }, []);
 
   return (
+    <>
+      <Container style={{ backgroundColor: 'white' }}>
+        {redeemReducer.LOresult && (
+          <Tabs
+            renderTabBar={() => (
+              <ScrollableTab
+                underlineStyle={{ backgroundColor: 'white', height: 2 }}
+              />
+            )}>
+            {redeemReducer.pageGuid.map((obj, index) => {
+              return (
+                <Tab
+                  key={obj.id + '' + obj.loName}
+                  heading={
+                    <TabHeading style={{ width: deviceWidth / 3, borderRightWidth: 0.3 }} >
+                      <Text
+                        style={{
+                          fontSize: FontSize.medium - 3,
+                          textAlign: 'center',
+                        }}>
+                        {obj.loName}
+                      </Text>
+                    </TabHeading>
+                  }>
+                  <RedeemPage obj={obj} />
+                </Tab>
+              );
+            })}
+          </Tabs>
 
-    <Container style={{ backgroundColor: 'white' }}>
-      {redeemReducer.LOresult && (
-        <Tabs
-          renderTabBar={() => (
-            <ScrollableTab
-              underlineStyle={{ backgroundColor: 'white', height: 2 }}
-            />
-          )}>
-          {redeemReducer.pageGuid.map((obj, index) => {
-            return (
-              <Tab
-                key={obj.id + '' + obj.loName}
-                heading={
-                  <TabHeading style={{ width: deviceWidth / 3, borderRightWidth: 0.3 }} >
-                    <Text
-                      style={{
-                        fontSize: FontSize.medium - 3,
-                        textAlign: 'center',
-                      }}>
-                      {obj.loName}
-                    </Text>
-                  </TabHeading>
-                }>
-                <RedeemPage obj={obj} />
-              </Tab>
-            );
-          })}
-        </Tabs>
-      )}
-      {loading && (
+        )}
+      </Container>
+
+      {redeemReducer.LOresult.length < 1 && (
         <View
           style={{
             width: deviceWidth,
-            height: deviceHeight - 50,
+            height: deviceHeight,
             opacity: 0.5,
-            backgroundColor: 'gray',
+            backgroundColor: '#ffff',
             alignSelf: 'center',
             justifyContent: 'center',
             alignContent: 'center',
             position: 'absolute',
           }}>
-          <ActivityIndicator
-            style={{
-              alignSelf: 'center',
-            }}
-            animating={loading}
-            size="large"
-            color="#0288D1"
-          />
+          <RedeemPage />
         </View>
       )}
-    </Container>
-
-
+    </>
 
   );
 };

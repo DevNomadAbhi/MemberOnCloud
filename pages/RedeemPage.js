@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -10,16 +10,16 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useSelector} from 'react-redux';
-import {FontSize} from '../components/FontSizeHelper';
+import { useSelector } from 'react-redux';
+import { FontSize } from '../components/FontSizeHelper';
 
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const Item = ({item, onPress, style}) => (
+const Item = ({ item, onPress, style }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
     <Image
       style={{
@@ -33,9 +33,9 @@ const Item = ({item, onPress, style}) => (
   </TouchableOpacity>
 );
 
-const RedeemPage = ({obj}) => {
+const RedeemPage = ({ obj }) => {
   const [selectedId, setSelectedId] = useState(null);
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const [arrayObj, setArrayObj] = useState([]);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
@@ -45,9 +45,9 @@ const RedeemPage = ({obj}) => {
   };
 
   const fetchImg = async (url) => {
-    
+
     let imgbase64 = null;
-    await RNFetchBlob.config({fileCache: true, appendExt: 'png'})
+    await RNFetchBlob.config({ fileCache: true, appendExt: 'png' })
       .fetch(
         'GET',
         'http://192.168.0.110:8906/Member/BplusErpDvSvrIIS.dll/DownloadFile',
@@ -78,17 +78,22 @@ const RedeemPage = ({obj}) => {
   };
 
   useEffect(() => {
-    wow();
+    if (obj)
+      wow();
+    else setLoading(true)
+  }, []);
+  useEffect(() => {
+
   }, []);
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     return (
       <View>
         <Item
           item={item}
           onPress={() => {
             setSelectedId(item.id);
-            navigation.navigate('ActivityPage', {item});
+            navigation.navigate('ActivityPage', { item });
           }}
         />
       </View>
@@ -97,7 +102,7 @@ const RedeemPage = ({obj}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-       <ActivityIndicator
+      <ActivityIndicator
         style={{
           flex: 1,
           justifyContent: 'center',
@@ -116,7 +121,7 @@ const RedeemPage = ({obj}) => {
         extraData={selectedId}
       />
 
-     
+
     </SafeAreaView>
   );
 };

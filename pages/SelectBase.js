@@ -229,6 +229,7 @@ const SelectBase = ({ route }) => {
       }
     }
     setLoading(false)
+ 
   }
 
   const _onPressAddbase = async () => {
@@ -278,22 +279,24 @@ const SelectBase = ({ route }) => {
         if (!check) {
           checkIPAddress('1')
         } else {
-          setLoading(false)
+         
         }
       } else {
         Alert.alert(
           Language.t('alert.errorTitle'),
           Language.t('selectBase.Alert3'), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
-        setLoading(false)
+          setLoading(false)
+       
       }
-      setLoading(false)
+     
     } else {
       Alert.alert(
         Language.t('alert.errorTitle'),
         Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
-      setLoading(false)
+        setLoading(false)
+     
     }
-
+    setLoading(false)
   }
 
   const _addGUID_proJ = async (guid) => {
@@ -314,7 +317,7 @@ const SelectBase = ({ route }) => {
       .then((json) => {
         if (json.ResponseCode == 200) {
           let responseData = JSON.parse(json.ResponseData);
-          if (responseData.Ec000400.length>0) {
+          if (responseData.Ec000400.length > 0) {
             console.log(`new project ID >> ${responseData.Ec000400[0].SHWJH_GUID}`)
             dispatch(loginActions.projectId(responseData.Ec000400[0].SHWJH_GUID))
             _FetchDataProject(guid, responseData.Ec000400[0].SHWJH_GUID)
@@ -328,7 +331,7 @@ const SelectBase = ({ route }) => {
         } else {
           return false
         }
-        
+
 
       })
       .catch((error) => {
@@ -461,8 +464,8 @@ const SelectBase = ({ route }) => {
 
         } else {
           Alert.alert(
-              Language.t('alert.errorTitle'),
-              "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            Language.t('alert.errorTitle'),
+            "ไม่พบรหัสโครงการ MEMBER ON CLOUD", [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         }
 
       })
@@ -565,43 +568,43 @@ const SelectBase = ({ route }) => {
             }),
           })
             .then((response) => response.json())
-            .then(async(json) => {
+            .then(async (json) => {
               if (json && json.ResponseCode == '200') {
                 let responseData = JSON.parse(json.ResponseData);
-           
-                  let newObj = {
-                    nameser: basename,
-                    urlser: newurl,
-                    usernameser: username,
-                    passwordser: password
-                  }
-                  console.log(json.ResponseCode)
 
-                  if (state == '-1') {
-                    for (let i in loginReducer.ipAddress) {
-                      if (i == updateindex) {
-                        temp.push(newObj)
-                      } else {
-                        temp.push(loginReducer.ipAddress[i])
-                      }
+                let newObj = {
+                  nameser: basename,
+                  urlser: newurl,
+                  usernameser: username,
+                  passwordser: password
+                }
+                console.log(json.ResponseCode)
+
+                if (state == '-1') {
+                  for (let i in loginReducer.ipAddress) {
+                    if (i == updateindex) {
+                      temp.push(newObj)
+                    } else {
+                      temp.push(loginReducer.ipAddress[i])
                     }
-                    dispatch(loginActions.ipAddress(temp))
-                    dispatch(databaseActions.setData(newObj))
-                  } else if (state == '1') {
-                    if (items.length > 0) {
-                      for (let i in items) {
-                        temp.push(items[i])
-                      }
-                    }
-                    temp.push(newObj)
-                    dispatch(loginActions.ipAddress(temp))
-                    dispatch(databaseActions.setData(newObj))
-                  } else if (state == '0') {
-                    dispatch(databaseActions.setData(newObj))
                   }
-                  _addGUID_proJ(responseData.BPAPUS_GUID)
-                
-              
+                  dispatch(loginActions.ipAddress(temp))
+                  dispatch(databaseActions.setData(newObj))
+                } else if (state == '1') {
+                  if (items.length > 0) {
+                    for (let i in items) {
+                      temp.push(items[i])
+                    }
+                  }
+                  temp.push(newObj)
+                  dispatch(loginActions.ipAddress(temp))
+                  dispatch(databaseActions.setData(newObj))
+                } else if (state == '0') {
+                  dispatch(databaseActions.setData(newObj))
+                }
+                _addGUID_proJ(responseData.BPAPUS_GUID)
+
+
               } else {
                 console.log('Function Parameter Required');
                 let temp_error = 'error_ser.' + json.ResponseCode;
@@ -610,14 +613,14 @@ const SelectBase = ({ route }) => {
                   Language.t('alert.errorTitle'),
                   Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
               }
-              setLoading(false)
+             
             })
             .catch((error) => {
               Alert.alert(
                 Language.t('alert.errorTitle'),
                 Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => _onPressSelectbaseValue(selectbaseValue) }]);
               console.error('_fetchGuidLogin ' + error);
-              setLoading(false)
+             
             });
         } else {
           console.log('Function Parameter Required');
@@ -626,8 +629,10 @@ const SelectBase = ({ route }) => {
           Alert.alert(
             Language.t('alert.errorTitle'),
             Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
+            setLoading(false)
+
         }
-        setLoading(false)
+      
       })
       .catch((error) => {
         Alert.alert(
@@ -635,8 +640,9 @@ const SelectBase = ({ route }) => {
           Language.t('alert.errorDetail'), [{ text: Language.t('alert.ok'), onPress: () => console.log('OK Pressed') }]);
         console.log('checkIPAddress>>', error);
         setLoading(false)
-      });
 
+      });
+     
 
   };
 
@@ -659,7 +665,7 @@ const SelectBase = ({ route }) => {
         <View>
           <Picker
             selectedValue={selectlanguage}
-            style={{ color: Colors.backgroundLoginColor, width: 100 }}
+            style={{ color: Colors.backgroundLoginColor, width: deviceWidth*0.3 }}
             mode="dropdown"
             onValueChange={(itemValue, itemIndex) => Alert.alert('', Language.t('menu.changeLanguage'), [{ text: Language.t('alert.ok'), onPress: () => setlanguageState(itemValue) }, { text: Language.t('alert.cancel'), onPress: () => { } }])}
           >
@@ -925,7 +931,7 @@ const SelectBase = ({ route }) => {
             width: deviceWidth,
             height: deviceHeight,
             opacity: 0.5,
-            backgroundColor: Colors.backgroundColorSecondary,
+            backgroundColor: 'black',
             alignSelf: 'center',
             justifyContent: 'center',
             alignContent: 'center',
@@ -939,7 +945,7 @@ const SelectBase = ({ route }) => {
               height: 100,
               alignSelf: 'center',
             }}
-            animating={loading}
+            animating={true}
             size="large"
             color={Colors.lightPrimiryColor}
           />

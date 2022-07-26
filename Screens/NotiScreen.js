@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  TouchableNativeFeedback
 } from 'react-native';
 import { FontSize } from '../components/FontSizeHelper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,7 +17,7 @@ import { connect } from 'react-redux';
 import * as NotiActions from '../src/actions/notiActions';
 import { useNavigation } from '@react-navigation/native';
 import RNFetchBlob from 'rn-fetch-blob';
-
+import Colors from '../src/Colors';
 const Item = ({ item, onPress, style }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
     <Image
@@ -39,13 +40,24 @@ const NotiScreen = () => {
   const [arrayObj, setArrayObj] = useState([]);
   const userReducer = useSelector(({ userReducer }) => userReducer);
   const databaseReducer = useSelector(({ databaseReducer }) => databaseReducer);
+  const [userIndex, setUserIndex] = useState(loginReducer.index);
   const [selectedId, setSelectedId] = useState(null);
   const dispatch = useDispatch();
   const deviceWidth = Dimensions.get('window').width;
   const deviceHeight = Dimensions.get('window').height;
   const navigation = useNavigation();
   const [isloading, setIsLoading] = useState(true);
+  const interestReducer = useSelector(({ interestReducer }) => interestReducer);
+  const Cdata = () => {
+    let tempUser = userReducer.userData[userIndex].interestImg
+    for (var i in tempUser)
+      for (var j in tempUser[i])
+        console.log(`tempUser[userIndex].interestImg >> ${tempUser[i][j].GUID}`)
+    for (let i in interestReducer.interestImg)
+      for (let j in interestReducer.interestImg[i])
+        console.log(`interestReducer.interestImg>> ${interestReducer.interestImg[i][j].CODE} ${interestReducer.interestImg[i][j].check}`)
 
+  }
   const closeLoading = () => {
     setIsLoading(false);
   };
@@ -75,7 +87,7 @@ const NotiScreen = () => {
   const fetchData = async () => {
     var arrayName = [];
     var arrayGuid = [];
-    await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+    await fetch(databaseReducer.Data.urlser + '/ECommerce', {
       method: 'POST',
       body: JSON.stringify({
         'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -83,7 +95,7 @@ const NotiScreen = () => {
         'BPAPUS-FUNCTION': 'GetLayout',
         'BPAPUS-PARAM':
           '{"SHWL_GUID": "' +
-          loginReducer.jsonResult[4].guid +
+          loginReducer.jsonResult[5].guid +
           '","SHWJ_IMAGE": "Y", "SHWL_IMAGE": "Y"}',
         'BPAPUS-FILTER': '',
         'BPAPUS-ORDERBY': '',
@@ -94,10 +106,22 @@ const NotiScreen = () => {
       .then((response) => response.json())
       .then((json) => {
         let responseData = JSON.parse(json.ResponseData);
-        for (var i in responseData.SHOWPAGE) {
-          arrayName.push(responseData.SHOWPAGE[i].SHWPH_EXPLAIN);
-          arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
-        }
+        let tempUser = userReducer.userData[userIndex].interestImg
+        for (var i in responseData.SHOWPAGE)
+
+          for (let j in tempUser)
+            for (let k in tempUser[j]) {
+              console.log(responseData.SHOWPAGE[i].SHWPH_TTL_CPTN)
+              if (responseData.SHOWPAGE[i].SHWPH_TTL_CPTN.search(tempUser[j][k].CODE.split('MB_')[1]) > -1 && tempUser[j][k].check == true) {
+                arrayName.push(responseData.SHOWPAGE[i].SHWPH_EXPLAIN);
+                arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
+              }
+              else if (responseData.SHOWPAGE[i].SHWPH_TTL_CPTN.search('ALL') > -1) {
+                arrayName.push(responseData.SHOWPAGE[i].SHWPH_EXPLAIN);
+                arrayGuid.push(responseData.SHOWPAGE[i].SHWPH_GUID);
+              }
+
+            }
         dispatch(NotiActions.LOguid(arrayGuid));
         dispatch(NotiActions.LOname(arrayName));
         dispatch(NotiActions.LOresult(json));
@@ -111,7 +135,7 @@ const NotiScreen = () => {
   const fetchPage = async (ra) => {
     let redeemGuid = [];
     for (let i in ra) {
-      await fetch(databaseReducer.Data.urlser+ '/ECommerce', {
+      await fetch(databaseReducer.Data.urlser + '/ECommerce', {
         method: 'POST',
         body: JSON.stringify({
           'BPAPUS-BPAPSV': loginReducer.serviceID,
@@ -137,6 +161,7 @@ const NotiScreen = () => {
             eName: responseData.SHOWPAGE.SHWPH_TTL_ECPTN,
             details: responseData.SHOWPAGE.SHWPH_EXPLAIN,
             imageext: responseData.SHOWPAGE.IMAGEEXT,
+
             img: 'file://' + (await fetchImg(responseData.SHOWPAGE.SHWPH_GUID, responseData.SHOWPAGE.IMAGEEXT)),
           };
           redeemGuid.push(jsonObj);
@@ -159,8 +184,10 @@ const NotiScreen = () => {
   };
 
   useEffect(() => {
+
     wow();
     setIsLoading(true);
+
   }, []);
 
   const renderItem = ({ item }) => {
@@ -179,6 +206,31 @@ const NotiScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* <TouchableNativeFeedback
+        onPress={() => {
+          Cdata()
+        }}>
+        <View>
+          <Text
+            style={{
+              color: Colors.buttonColorPrimary,
+              backgroundColor: 'red',
+              textDecorationLine: 'underline',
+              fontSize: FontSize.medium,
+              alignSelf: 'center',
+              padding: 10,
+            }}>
+            555555
+          </Text>
+        </View>
+      </TouchableNativeFeedback> */}
+
+      <FlatList
+        data={arrayObj}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        extraData={selectedId}
+      />
       <ActivityIndicator
         style={{
           flex: 1,
@@ -191,13 +243,6 @@ const NotiScreen = () => {
         size="large"
         color="#0288D1"
       />
-      <FlatList
-        data={arrayObj}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        extraData={selectedId}
-      />
-
     </View>
   );
 };

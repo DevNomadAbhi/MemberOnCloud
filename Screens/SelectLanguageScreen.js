@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import * as userActions from '../src/actions/userActions';
+import * as loginActions from '../src/actions/loginActions';
 import {
   Text,
   Icon,
@@ -11,18 +12,19 @@ import {
   Button,
   Container,
 } from 'native-base';
-import {FontSize} from '../components/FontSizeHelper';
-import {connect} from 'react-redux';
-import {useSelector, useDispatch} from 'react-redux';
-import {Language, changeLanguage} from '../translations/I18n';
+import { FontSize } from '../components/FontSizeHelper';
+import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { Language, changeLanguage } from '../translations/I18n';
 import RNRestart from 'react-native-restart';
 import Colors from '../src/Colors';
-
+import { useNavigation } from '@react-navigation/native';
 const SelectLanguageScreen = () => {
-  const userReducer = useSelector(({userReducer}) => userReducer);
-  const loginReducer = useSelector(({loginReducer}) => loginReducer);
+  const navigation = useNavigation();
+  const userReducer = useSelector(({ userReducer }) => userReducer);
+  const loginReducer = useSelector(({ loginReducer }) => loginReducer);
   const [userIndex, setUserIndex] = useState(loginReducer.index);
-  let languageNow = userReducer.userData.length ?  userReducer.userData[userIndex].language : 'th';
+  let languageNow = Language.getLang() == 'th' ? 'th' : 'en';
   const [language, setLanguage] = useState({
     th: false,
     en: false,
@@ -31,36 +33,28 @@ const SelectLanguageScreen = () => {
 
   useEffect(() => {
     console.log('languageNow :' + languageNow);
-    if (languageNow) {
-      if (languageNow === 'th') {
-        setLanguage({
-          language: {th: true},
-        });
-      } else if (languageNow === 'en') {
-        setLanguage({
-          language: {en: true},
-        });
-      }
-    }
   }, []);
 
   const _PressChangeLanguage = async (newLanguage) => {
     let tempUser = userReducer.userData;
-    await changeLanguage(newLanguage);
+    changeLanguage(newLanguage);
     tempUser[userIndex].language = newLanguage;
+    dispatch(loginActions.setLanguage(newLanguage))
     dispatch(userActions.setUserData(tempUser));
-    setTimeout(() => {
-      RNRestart.Restart();
-    }, 1000);
+    navigation.dispatch(
+      navigation.replace('LoginScreen', { Language: newLanguage })
+    )
+    console.log(itemValue)
+
   };
 
   return (
     <Container>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-        <List style={{backgroundColor: Colors.backgroundColorSecondary}}>
+        <List style={{ backgroundColor: Colors.backgroundColorSecondary }}>
           <ListItem noIndent onPress={() => _PressChangeLanguage('th')}>
             <Left>
-              <View style={{paddingRight: 10}}>
+              <View style={{ paddingRight: 10 }}>
                 {languageNow == 'th' ? (
                   <Icon
                     ios="ios-radio-button-on"
@@ -73,7 +67,7 @@ const SelectLanguageScreen = () => {
                   />
                 )}
               </View>
-              <Text style={{fontSize: FontSize.medium, color: Colors.fontColor}}>
+              <Text style={{ fontSize: FontSize.medium, color: Colors.fontColor }}>
                 ภาษาไทย
               </Text>
             </Left>
@@ -81,7 +75,7 @@ const SelectLanguageScreen = () => {
           </ListItem>
           <ListItem noIndent onPress={() => _PressChangeLanguage('en')}>
             <Left>
-              <View style={{paddingRight: 10}}>
+              <View style={{ paddingRight: 10 }}>
                 {languageNow == 'en' ? (
                   <Icon
                     ios="ios-radio-button-on"
@@ -94,7 +88,7 @@ const SelectLanguageScreen = () => {
                   />
                 )}
               </View>
-              <Text style={{fontSize: FontSize.medium, color: Colors.fontColor}}>
+              <Text style={{ fontSize: FontSize.medium, color: Colors.fontColor }}>
                 English
               </Text>
             </Left>

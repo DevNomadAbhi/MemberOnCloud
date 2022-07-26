@@ -15,7 +15,7 @@ const DAY = 'D';
 class DatePicker extends Component {
   constructor(props) {
     super(props);
-    console.log('ttt');
+    
     let currentYear =
       Language.getLang() == 'th'
         ? moment().add(543, 'years').format('YYYY')

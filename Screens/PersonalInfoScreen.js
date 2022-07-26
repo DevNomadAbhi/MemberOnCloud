@@ -27,7 +27,7 @@ import {
   Title,
   Picker,
 } from 'native-base';
- 
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import DatePicker from '../components/DatePicker';
@@ -48,6 +48,7 @@ const PersonalInfoScreen = () => {
   const [userIndex, setUserIndex] = useState(loginReducer.index);
   const [selectedId, setSelectedId] = useState(null);
   const [isShowDialog, setShowDialog] = useState(false);
+
   const [data, setData] = useState({
     title: userReducer.userData[userIndex].title,
     firstName: userReducer.userData[userIndex].firstName,
@@ -72,6 +73,21 @@ const PersonalInfoScreen = () => {
     email: data.email,
   });
   const [gender, setGender] = useState('');
+  useEffect(() => {
+    let birthDate = ''
+    console.log(`newData.birthDate > ${newData.birthDate}`)
+    console.log(`data.birthDate > ${data.birthDate}`)
+    if (newData.birthDate == '') {
+      birthDate = data.birthDate
+      console.log(`birthDate > ${birthDate}`)
+    } else {
+      birthDate = new Date(newData.birthDate)
+      birthDate = `${birthDate.getFullYear()}${(birthDate.getMonth() + 1) >= 10 ? (birthDate.getMonth() + 1) : '0' + (birthDate.getMonth() + 1)}${birthDate.getDate() >= 10 ? birthDate.getDate() : '0' + birthDate.getDate()}`;
+      console.log(`newData.birthDate > ${birthDate}`)
+    }
+
+
+  }, [newData.birthDate])
   const addGender = () => {
 
     if (userReducer.userData[userIndex].title == 'นาย') {
@@ -96,6 +112,7 @@ const PersonalInfoScreen = () => {
 
   const _setDispatch = async () => {
     let tempUser = userReducer.userData;
+
     if (newData.title == data.title) {
       tempUser[userIndex].title = data.title;
     } else {
@@ -111,10 +128,12 @@ const PersonalInfoScreen = () => {
     } else {
       tempUser[userIndex].lastName = newData.lastName;
     }
-    if (newData.birthDate == '') {
-      tempUser[userIndex].birthDate = data.birthDate;
+    if (newData.birthDate == data.birthDate ) {
+
+      tempUser[userIndex].birthDate = data.birthDate
     } else {
-      tempUser[userIndex].birthDate = newData.birthDate.replace(/-/gi, '');
+      let birthDate = new Date(newData.birthDate)
+      tempUser[userIndex].birthDate = `${birthDate.getFullYear()}${(birthDate.getMonth() + 1) >= 10 ? (birthDate.getMonth() + 1) : '0' + (birthDate.getMonth() + 1)}${birthDate.getDate() >= 10 ? birthDate.getDate() : '0' + birthDate.getDate()}`;
     }
     if (newData.ADDR_1 == '') {
       tempUser[userIndex].ADDR_1 = data.ADDR_1;
@@ -148,6 +167,7 @@ const PersonalInfoScreen = () => {
       tempUser[userIndex].sex = 'F';
     }
     const navi = 'Menu';
+
     const newnvi = { navi, tempUser };
     navigation.navigate('AuthenticationScreen', { navi: newnvi });
   };
@@ -456,10 +476,10 @@ const PersonalInfoScreen = () => {
             <Text style={styles.textTitle}>
               {Language.t('profile.birthday')}
             </Text>
-            <View  style={styles.textInput}>
-            <DatePicker date={newData.birthDate} onChange={onChangeData} />
+            <View style={styles.textInput}>
+              <DatePicker date={newData.birthDate} onChange={onChangeData} />
             </View>
-           
+
             <Text style={styles.textTitle}>
               {Language.t('profile.address')}
               {Language.t('login.and')}
@@ -519,7 +539,7 @@ const PersonalInfoScreen = () => {
               style={styles.textInput}></TextInput>
 
             <Text
-              style={{ marginTop: 20, fontSize: FontSize.medium, padding: 5,borderBottomWidth:1 }}>
+              style={{ marginTop: 20, fontSize: FontSize.medium, padding: 5, borderBottomWidth: 1 }}>
               {Language.t('interested.header')}
             </Text>
           </>
@@ -629,7 +649,7 @@ const styles = StyleSheet.create({
     color: Colors.borderColor
   },
   textTitle: {
-    marginTop:5,
+    marginTop: 5,
     fontSize: FontSize.medium,
     padding: 5,
   },
